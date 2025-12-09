@@ -1,0 +1,31 @@
+# The svn-fast-info plugin has to be activated for this to work.
+local ret_status="%(?:%{$fg_bold[green]%}➜:%{$fg_bold[red]%}➜)"
+PROMPT=$'%{$fg_bold[green]%}%{$fg[cyan]%}%c%{$fg_bold[blue]%}$(git_prompt_info)$(STATUS=$(git_prompt_status); [[ -n $STATUS ]] && echo "%{$fg[yellow]%}${(j: :)${(s::)STATUS}}%{$fg[yellow]%}")%{$fg_bold[blue]%}$(svn_prompt_info)%{$reset_color%}\n${ret_status}%{$reset_color%}'
+
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[magenta]%} 󰘬"
+ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
+ZSH_THEME_GIT_PROMPT_DIRTY=""
+ZSH_THEME_GIT_PROMPT_CLEAN=""
+
+ZSH_THEME_GIT_PROMPT_UNTRACKED="󱀶"
+ZSH_THEME_GIT_PROMPT_ADDED=""
+ZSH_THEME_GIT_PROMPT_MODIFIED=""
+ZSH_THEME_GIT_PROMPT_RENAMED="󰘎"
+ZSH_THEME_GIT_PROMPT_DELETED=""
+ZSH_THEME_GIT_PROMPT_UNMERGED=""
+ZSH_THEME_GIT_PROMPT_AHEAD="󰒬"
+ZSH_THEME_GIT_PROMPT_BEHIND="󰒫"
+ZSH_THEME_GIT_PROMPT_DIVERGED="󰃻"
+ZSH_THEME_GIT_PROMPT_STASHED=""
+
+ZSH_PROMPT_BASE_COLOR="%{$fg_bold[blue]%}"
+ZSH_THEME_BRANCH_NAME_COLOR="%{$fg_bold[red]%}"
+ZSH_THEME_SVN_PROMPT_PREFIX="svn:("
+ZSH_THEME_SVN_PROMPT_SUFFIX=")"
+ZSH_THEME_SVN_PROMPT_DIRTY=""
+ZSH_THEME_SVN_PROMPT_CLEAN=" "
+ZSH_THEME_SVN_PROMPT_ADDITIONS=""
+ZSH_THEME_SVN_PROMPT_MODIFICATIONS=""
+ZSH_THEME_SVN_PROMPT_DELETIONS=""
+ZSH_THEME_SVN_PROMPT_REPLACEMENTS=""
+ZSH_THEME_SVN_PROMPT_UNTRACKED="󱀶"
