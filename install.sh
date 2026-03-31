@@ -15,7 +15,7 @@ Options:
   --link-only           Only link dotfiles into place.
   --packages-only       Only install packages and toolchains.
   --skip-default-shell  Do not try to switch the login shell to fish.
-  --skip-lang-tools     Skip fnm, bun, and deno installers.
+  --skip-lang-tools     Skip fnm and bun installers.
   -h, --help            Show this help text.
 EOF
 }
@@ -260,11 +260,6 @@ install_optional_toolchains() {
   else
     warn "unzip is required to install bun; skipping bun"
   fi
-
-  install_via_script_if_missing \
-    deno \
-    deno \
-    'curl -fsSL https://deno.land/install.sh | sh -s -- -y'
 
   if [ -x "$HOME/.local/share/fnm/fnm" ] && ! have fnm; then
     export PATH="$HOME/.local/share/fnm:$PATH"

@@ -14,7 +14,6 @@ end
 
 set -gx GOPATH $HOME/go
 set -gx BUN_INSTALL $HOME/.bun
-set -gx DENO_INSTALL $HOME/.deno
 set -gx FNM_DIR $HOME/.local/share/fnm
 set -gx PNPM_HOME $HOME/.local/share/pnpm
 set -gx CLICOLOR 1
@@ -35,7 +34,6 @@ __dotfiles_add_path $HOME/.cargo/bin
 __dotfiles_add_path $HOME/go/bin
 __dotfiles_add_path $HOME/.local/share/fnm
 __dotfiles_add_path $HOME/.bun/bin
-__dotfiles_add_path $HOME/.deno/bin
 __dotfiles_add_path $HOME/.local/share/pnpm
 __dotfiles_add_path $HOME/.foundry/bin
 

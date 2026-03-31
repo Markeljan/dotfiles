@@ -45,7 +45,7 @@ The committed `fish` setup keeps the portable parts of the current machine:
 
 - common PATH entries for local toolchains
 - `fzf` defaults and preview support
-- `pnpm`, `bun`, `deno`, `python`, and `git` aliases
+- `pnpm`, `bun`, `python`, and `git` aliases
 - `eza`-based `ls` aliases when `eza` is present
 - `zoxide`, `starship`, `direnv`, and `fnm` initialization when installed
 - simple fish keybindings for undo/redo
@@ -102,5 +102,5 @@ The installer also runs `Lazy restore` headlessly so the plugins are installed d
 
 - `install.sh` supports `brew`, `apt-get`, `dnf`, and `pacman`.
 - On Linux, if the distro `neovim` package is older than `0.8`, the installer falls back to the official stable release under `~/.local/share/neovim-stable` and symlinks `~/.local/bin/nvim`.
-- When a distro package is missing, the script falls back to official installers for a few userland tools such as `starship`, `zoxide`, `fnm`, `bun`, and `deno`.
+- When a distro package is missing, the script falls back to official installers for a few userland tools such as `starship`, `zoxide`, `fnm`, and `bun`.
 - On Debian-family systems, the installer creates `~/.local/bin/fd` and `~/.local/bin/bat` symlinks when only `fdfind` or `batcat` exist.

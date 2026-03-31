@@ -30,14 +30,6 @@ __dotfiles_abbr gfl "git fetch && git pull"
 __dotfiles_abbr dclaude "claude --dangerously-skip-permissions"
 __dotfiles_abbr dcodex "codex --dangerously-bypass-approvals-and-sandbox"
 
-if type -q deno
-    alias di="deno install"
-    alias dr="deno run"
-    alias dt="deno test"
-    alias dl="deno lint"
-    alias df="deno fmt"
-end
-
 if type -q python3
     alias py="python3"
     alias python="python3"
