@@ -360,6 +360,7 @@ install_fish_plugins() {
 
 set_default_fish_shell() {
   local fish_path
+  local shell_registered=1
 
   if [ "$SKIP_DEFAULT_SHELL" -eq 1 ]; then
     return
@@ -378,7 +379,17 @@ set_default_fish_shell() {
   fi
 
   if [ -f /etc/shells ] && ! grep -qx "$fish_path" /etc/shells 2>/dev/null; then
-    run_sudo sh -c "printf '%s\n' '$fish_path' >> /etc/shells" || warn "could not add $fish_path to /etc/shells"
+    if run_sudo sh -c "printf '%s\n' '$fish_path' >> /etc/shells"; then
+      log "added $fish_path to /etc/shells"
+    else
+      shell_registered=0
+      warn "could not add $fish_path to /etc/shells; run: echo \"$fish_path\" | sudo tee -a /etc/shells"
+    fi
+  fi
+
+  if [ "$shell_registered" -eq 0 ]; then
+    warn "skipping chsh until $fish_path is listed in /etc/shells"
+    return
   fi
 
   if have chsh; then

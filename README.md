@@ -1,6 +1,6 @@
 # Dotfiles
 
-Portable dotfiles for a Linux-first development setup with `fish` as the default shell.
+Portable dotfiles for a macOS and Linux development setup with `fish` as the default shell.
 
 This repo is intentionally narrow:
 
@@ -25,6 +25,13 @@ This repo is intentionally narrow:
 git clone <your-private-dotfiles-repo> ~/dotfiles
 cd ~/dotfiles
 ./install.sh
+```
+
+If the shell was not changed automatically, make sure `fish` is listed in `/etc/shells` and then run:
+
+```bash
+echo "$(command -v fish)" | sudo tee -a /etc/shells
+chsh -s "$(command -v fish)"
 ```
 
 For a link-only install:
@@ -101,6 +108,7 @@ The installer also runs `Lazy restore` headlessly so the plugins are installed d
 ## Notes
 
 - `install.sh` supports `brew`, `apt-get`, `dnf`, and `pacman`.
+- On macOS and Linux, the installer tries to add the detected `fish` binary to `/etc/shells` before it calls `chsh`.
 - On Linux, if the distro `neovim` package is older than `0.8`, the installer falls back to the official stable release under `~/.local/share/neovim-stable` and symlinks `~/.local/bin/nvim`.
 - When a distro package is missing, the script falls back to official installers for a few userland tools such as `starship`, `zoxide`, `fnm`, and `bun`.
 - On Debian-family systems, the installer creates `~/.local/bin/fd` and `~/.local/bin/bat` symlinks when only `fdfind` or `batcat` exist.

@@ -1,13 +1,13 @@
 # AGENTS.md
 
-This repo is a portable dotfiles baseline. Use it to install a Linux-friendly shell environment with `fish` as the primary shell.
+This repo is a portable dotfiles baseline. Use it to install a macOS- and Linux-friendly shell environment with `fish` as the primary shell.
 
 ## Primary workflow
 
 1. Clone the repo.
 2. Run `./install.sh`.
 3. If package installation is not desired, run `./install.sh --link-only`.
-4. If the shell was not changed automatically, run `chsh -s "$(command -v fish)"`.
+4. If the shell was not changed automatically, add `fish` to `/etc/shells` and run `chsh -s "$(command -v fish)"`.
 
 ## Managed targets
 
