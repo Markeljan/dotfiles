@@ -1,0 +1,12 @@
+[commit]
+    gpgsign = true
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    program = /path/to/your/signing/program
+
+[user]
+    signingkey = ssh-ed25519 AAAA...
+

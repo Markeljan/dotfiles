@@ -1,0 +1,56 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+format = """
+$directory$git_branch$git_status$aws$gcloud$bun$nodejs$python$cmd_duration
+$character"""
+
+add_newline = false
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = false
+home_symbol = "~"
+
+[git_branch]
+symbol = "git:"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "yellow"
+format = "([$all_status$ahead_behind]($style) )"
+
+[aws]
+symbol = "aws:"
+style = "yellow"
+format = "[$symbol($profile )]($style)"
+
+[gcloud]
+symbol = "gcp:"
+format = "[$symbol$project]($style) "
+
+[bun]
+symbol = "bun:"
+format = "[$symbol$version]($style) "
+version_format = "${raw}"
+
+[nodejs]
+symbol = "node:"
+format = "[$symbol$version]($style) "
+version_format = "${major}"
+
+[python]
+symbol = "py:"
+python_binary = "python3"
+format = "[$symbol$version]($style) "
+
+[cmd_duration]
+min_time = 3000
+style = "dimmed white"
+format = "[$duration]($style) "
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"
+vicmd_symbol = "[<](bold yellow)"
+
