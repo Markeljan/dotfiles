@@ -56,7 +56,7 @@ It defaults to this repo and to conservative server install flags:
 
 - `DOTFILES_REPO` defaults to `https://github.com/markeljan/dotfiles.git`
 - `DOTFILES_REF` defaults to `main`
-- `INSTALL_FLAGS` defaults to `--skip-default-shell --skip-lang-tools`
+- `INSTALL_FLAGS` defaults to `--skip-lang-tools`
 
 The script:
 
@@ -68,8 +68,8 @@ The script:
 
 Notes:
 
-- The launch script intentionally does not change the login shell by default.
-  After the instance is up, you can switch to `fish` manually:
+- The launch script will try to set `fish` as the login shell during bootstrap.
+  If that step does not succeed on your instance image, run this after login:
 
 ```bash
 echo "$(command -v fish)" | sudo tee -a /etc/shells

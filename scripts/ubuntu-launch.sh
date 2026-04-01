@@ -6,7 +6,7 @@ export DEBIAN_FRONTEND=noninteractive
 TARGET_USER="${TARGET_USER:-ubuntu}"
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/markeljan/dotfiles.git}"
 DOTFILES_REF="${DOTFILES_REF:-main}"
-INSTALL_FLAGS="${INSTALL_FLAGS:---skip-default-shell --skip-lang-tools}"
+INSTALL_FLAGS="${INSTALL_FLAGS:---skip-lang-tools}"
 LOG_FILE="${LOG_FILE:-/var/log/dotfiles-launch.log}"
 
 exec > >(tee -a "$LOG_FILE") 2>&1
