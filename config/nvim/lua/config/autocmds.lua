@@ -7,6 +7,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
       return
     end
 
+    vim.cmd([[silent! aunmenu PopUp.How-to\ disable\ mouse]])
+    vim.cmd([[silent! aunmenu PopUp.-2-]])
+
     local is_directory = args.file ~= "" and vim.fn.isdirectory(args.file) == 1
 
     if is_directory then

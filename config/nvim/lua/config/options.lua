@@ -11,6 +11,7 @@ vim.opt.relativenumber = false
 vim.opt.cursorline = true
 vim.opt.signcolumn = "yes"
 vim.opt.mouse = "a"
+vim.opt.mousescroll = "ver:1,hor:3"
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 vim.opt.hidden = true

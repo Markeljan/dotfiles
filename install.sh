@@ -197,8 +197,30 @@ install_packages() {
 
   case "$pm" in
     brew)
+      local packages=(
+        git
+        fish
+        fzf
+        ripgrep
+        fd
+        eza
+        bat
+        jq
+        tmux
+        neovim
+        python
+        pipx
+        zoxide
+        starship
+        gh
+      )
+
+      if [ "$(uname -s)" != "Darwin" ]; then
+        packages=(curl unzip "${packages[@]}")
+      fi
+
       log "installing base packages with brew"
-      brew install curl git fish fzf ripgrep fd eza bat jq tmux neovim python pipx zoxide starship gh
+      brew install "${packages[@]}"
       ;;
     apt)
       log "installing base packages with apt-get"
@@ -233,9 +255,13 @@ install_via_script_if_missing() {
 }
 
 install_optional_toolchains() {
+  local pm
+
   if [ "$SKIP_LANG_TOOLS" -eq 1 ]; then
     return
   fi
+
+  pm="$(detect_package_manager)"
 
   install_via_script_if_missing \
     starship \
@@ -247,10 +273,17 @@ install_optional_toolchains() {
     zoxide \
     'curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash'
 
-  install_via_script_if_missing \
-    fnm \
-    fnm \
-    'curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$HOME/.local/share/fnm" --skip-shell'
+  if ! have fnm; then
+    if [ "$pm" = "brew" ]; then
+      log "installing fnm with brew"
+      brew install fnm
+    else
+      install_via_script_if_missing \
+        fnm \
+        fnm \
+        'curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$HOME/.local/share/fnm" --skip-shell'
+    fi
+  fi
 
   if have unzip; then
     install_via_script_if_missing \

@@ -20,7 +20,8 @@ require("lazy").setup({
     { import = "plugins" },
   },
   checker = {
-    enabled = true,
+    -- Avoid startup update notifications; update plugins manually with :Lazy update.
+    enabled = false,
   },
   change_detection = {
     notify = false,
@@ -35,4 +36,3 @@ end
 
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
-
