@@ -46,6 +46,36 @@ For package installation only:
 ./install.sh --packages-only
 ```
 
+## Ubuntu launch script
+
+For Ubuntu 24.04 instances, you can use
+[`scripts/ubuntu-launch.sh`](scripts/ubuntu-launch.sh) as a first-boot launch
+script in Lightsail, cloud-init user data, or other VM bootstrap flows.
+
+It defaults to this repo and to conservative server install flags:
+
+- `DOTFILES_REPO` defaults to `https://github.com/markeljan/dotfiles.git`
+- `DOTFILES_REF` defaults to `main`
+- `INSTALL_FLAGS` defaults to `--skip-default-shell --skip-lang-tools`
+
+The script:
+
+- runs `apt-get update` and `apt-get upgrade`
+- installs `ca-certificates`, `curl`, and `git`
+- clones the dotfiles repo into `/home/ubuntu/dotfiles`
+- runs `./install.sh` as the `ubuntu` user
+- writes a log to `/var/log/dotfiles-launch.log`
+
+Notes:
+
+- The launch script intentionally does not change the login shell by default.
+  After the instance is up, you can switch to `fish` manually:
+
+```bash
+echo "$(command -v fish)" | sudo tee -a /etc/shells
+chsh -s "$(command -v fish)"
+```
+
 ## Included baseline
 
 The committed `fish` setup keeps the portable parts of the current machine:
