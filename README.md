@@ -50,13 +50,14 @@ For package installation only:
 
 For Ubuntu 24.04 instances, you can use
 [`scripts/ubuntu-launch.sh`](scripts/ubuntu-launch.sh) as a first-boot launch
-script in Lightsail, cloud-init user data, or other VM bootstrap flows.
+script, cloud-init user data, or other VM bootstrap flows.
 
-It defaults to this repo and to conservative server install flags:
+It defaults to this repo and runs the full installer:
 
 - `DOTFILES_REPO` defaults to `https://github.com/markeljan/dotfiles.git`
 - `DOTFILES_REF` defaults to `main`
-- `INSTALL_FLAGS` defaults to `--skip-lang-tools`
+- `INSTALL_FLAGS` defaults to empty, which runs `./install.sh` with the full
+  package and toolchain setup
 
 The script:
 
