@@ -34,6 +34,27 @@ have() {
   command -v "$1" >/dev/null 2>&1
 }
 
+brew_executable() {
+  if have brew; then
+    command -v brew
+    return
+  fi
+
+  if [ -x /opt/homebrew/bin/brew ]; then
+    echo /opt/homebrew/bin/brew
+    return
+  fi
+
+  if [ -x /usr/local/bin/brew ]; then
+    echo /usr/local/bin/brew
+    return
+  fi
+
+  if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    echo /home/linuxbrew/.linuxbrew/bin/brew
+  fi
+}
+
 run_sudo() {
   if have sudo; then
     sudo "$@"
@@ -193,8 +214,39 @@ detect_package_manager() {
   fi
 }
 
+ensure_homebrew() {
+  local brew_path
+
+  if [ "$(uname -s)" != "Darwin" ]; then
+    return
+  fi
+
+  brew_path="$(brew_executable || true)"
+  if [ -n "$brew_path" ]; then
+    eval "$("$brew_path" shellenv)"
+    return
+  fi
+
+  if ! have curl; then
+    warn "curl is required to bootstrap Homebrew on macOS"
+    return
+  fi
+
+  log "installing Homebrew"
+  NONINTERACTIVE=1 CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  brew_path="$(brew_executable || true)"
+  if [ -n "$brew_path" ]; then
+    eval "$("$brew_path" shellenv)"
+  else
+    warn "Homebrew installation finished but brew is still not on PATH"
+  fi
+}
+
 install_packages() {
   local pm
+
+  ensure_homebrew
   pm="$(detect_package_manager)"
 
   case "$pm" in
@@ -213,6 +265,7 @@ install_packages() {
         python
         pipx
         zoxide
+        direnv
         starship
         gh
       )
@@ -227,15 +280,15 @@ install_packages() {
     apt)
       log "installing base packages with apt-get"
       apt_update_with_github_cli_repair
-      run_sudo apt-get install -y curl git fish tmux neovim fzf ripgrep fd-find bat jq python3 python3-pip pipx unzip
+      run_sudo apt-get install -y curl git fish tmux neovim fzf ripgrep fd-find bat jq python3 python3-pip pipx unzip direnv
       ;;
     dnf)
       log "installing base packages with dnf"
-      run_sudo dnf install -y curl git fish tmux neovim fzf ripgrep fd-find bat jq python3 python3-pip pipx unzip
+      run_sudo dnf install -y curl git fish tmux neovim fzf ripgrep fd-find bat jq python3 python3-pip pipx unzip direnv
       ;;
     pacman)
       log "installing base packages with pacman"
-      run_sudo pacman -Sy --noconfirm curl git fish tmux neovim fzf ripgrep fd bat jq python python-pip python-pipx unzip
+      run_sudo pacman -Sy --noconfirm curl git fish tmux neovim fzf ripgrep fd bat jq python python-pip python-pipx unzip direnv
       ;;
     none)
       warn "no supported package manager found; skipping base package installation"
@@ -425,6 +478,12 @@ set_default_fish_shell() {
   fi
 
   fish_path="$(command -v fish)"
+
+  if [ ! -t 0 ] || [ ! -t 1 ]; then
+    warn "skipping login shell change because the installer is running without a TTY"
+    warn "set it later with: chsh -s \"$fish_path\""
+    return
+  fi
 
   if [ "${SHELL:-}" = "$fish_path" ]; then
     log "fish is already the current shell"
