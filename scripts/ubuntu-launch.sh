@@ -3,6 +3,10 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/apt.sh
+. "$SCRIPT_DIR/lib/apt.sh"
+
 TARGET_USER="${TARGET_USER:-ubuntu}"
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/markeljan/dotfiles.git}"
 DOTFILES_REF="${DOTFILES_REF:-main}"
@@ -32,7 +36,7 @@ if [ -z "$TARGET_HOME" ] || [ ! -d "$TARGET_HOME" ]; then
 fi
 
 log "updating apt metadata"
-apt-get update
+apt_update_with_github_cli_repair
 
 log "upgrading installed packages"
 apt-get upgrade -y

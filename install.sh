@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/apt.sh
+. "$ROOT_DIR/scripts/lib/apt.sh"
 LINK_ONLY=0
 PACKAGES_ONLY=0
 SKIP_DEFAULT_SHELL=0
@@ -224,7 +226,7 @@ install_packages() {
       ;;
     apt)
       log "installing base packages with apt-get"
-      run_sudo apt-get update
+      apt_update_with_github_cli_repair
       run_sudo apt-get install -y curl git fish tmux neovim fzf ripgrep fd-find bat jq python3 python3-pip pipx unzip
       ;;
     dnf)
@@ -365,6 +367,8 @@ install_nvim_plugins() {
 }
 
 install_fish_plugins() {
+  local supports_fzf_fish=1
+
   if ! have fish; then
     warn "fish is not installed; skipping fisher and fish plugin setup"
     return
@@ -375,6 +379,11 @@ install_fish_plugins() {
     return
   fi
 
+  if ! fish -lc 'set -f __dotfiles_probe 1; set -e __dotfiles_probe' >/dev/null 2>&1; then
+    supports_fzf_fish=0
+    warn "installed fish is too old for the current fzf.fish plugin; skipping it"
+  fi
+
   fish -lc "
     if not functions -q fisher
       curl -fsSL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
@@ -382,7 +391,18 @@ install_fish_plugins() {
     end
 
     if test -f ~/.config/fish/fish_plugins
-      set -l plugins (string match -rv '^\s*(#|$)' < ~/.config/fish/fish_plugins)
+      set -l plugins
+      for plugin in (string match -rv '^\s*(#|$)' < ~/.config/fish/fish_plugins)
+        if test \"$supports_fzf_fish\" -eq 0 -a \"\$plugin\" = 'patrickf1/fzf.fish'
+          continue
+        end
+
+        set -a plugins \$plugin
+      end
+
+      if test \"$supports_fzf_fish\" -eq 0
+        fisher remove patrickf1/fzf.fish >/dev/null 2>/dev/null
+      end
 
       if test (count \$plugins) -gt 0
         fisher install \$plugins

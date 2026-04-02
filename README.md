@@ -139,6 +139,7 @@ The installer also runs `Lazy restore` headlessly so the plugins are installed d
 ## Notes
 
 - `install.sh` supports `brew`, `apt-get`, `dnf`, and `pacman`.
+- On Debian-family systems, the installer retries `apt-get update` after refreshing the GitHub CLI signing key when a stale `cli.github.com` source is already configured on the machine.
 - On macOS and Linux, the installer tries to add the detected `fish` binary to `/etc/shells` before it calls `chsh`.
 - On Linux, if the distro `neovim` package is older than `0.8`, the installer falls back to the official stable release under `~/.local/share/neovim-stable` and symlinks `~/.local/bin/nvim`.
 - When a distro package is missing, the script falls back to official installers for a few userland tools such as `starship`, `zoxide`, `fnm`, and `bun`.
