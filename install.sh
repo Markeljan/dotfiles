@@ -321,7 +321,7 @@ install_optional_toolchains() {
   install_via_script_if_missing \
     starship \
     starship \
-    'curl -fsSL https://starship.rs/install.sh | sh -s -- -y'
+    'mkdir -p "$HOME/.local/bin" && curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"'
 
   install_via_script_if_missing \
     zoxide \

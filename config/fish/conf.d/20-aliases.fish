@@ -33,13 +33,18 @@ if status is-interactive
     end
 
     if type -q eza
+        alias l="eza --group-directories-first -la"
         alias ls="eza --group-directories-first"
         alias ll="eza --group-directories-first -la"
         alias lt="eza --tree --level=2 --group-directories-first"
     else if type -q exa
+        alias l="exa --group-directories-first -la"
         alias ls="exa --group-directories-first"
         alias ll="exa --group-directories-first -la"
         alias lt="exa --tree --level=2 --group-directories-first"
+    else
+        alias l="ls -la"
+        alias ll="ls -la"
     end
 
     functions --erase __dotfiles_abbr
