@@ -1,8 +1,40 @@
 if status is-interactive
     if type -q fzf
+        set -l fzf_help (fzf --help 2>/dev/null)
         set -l fzf_color '--color=fg:-1,fg+:#d0d0d0,bg:-1,bg+:#262626,hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00,prompt:#00d7ff,spinner:#af5fff,pointer:#af5fff,header:#87afaf,border:#262626,query:#d9d9d9'
-        set -l fzf_layout '--border=rounded --prompt="> " --marker="*" --pointer=">" --separator="-" --scrollbar="|" --info=right --height=100% --preview-window=right:50%:border-rounded'
-        set -gx FZF_DEFAULT_OPTS "$fzf_color $fzf_layout --ansi --bind 'ctrl-h:change-preview-window(hidden|)' --preview '$FZF_PREVIEW_SCRIPT {}'"
+        set -l fzf_layout '--prompt="> " --marker="*" --pointer=">"'
+
+        if string match -rq -- '--border\[' $fzf_help
+            set fzf_layout "$fzf_layout --border=rounded"
+        else if string match -rq -- '--border' $fzf_help
+            set fzf_layout "$fzf_layout --border"
+        end
+
+        if string match -rq -- '--separator' $fzf_help
+            set fzf_layout "$fzf_layout --separator=-"
+        end
+
+        if string match -rq -- '--scrollbar' $fzf_help
+            set fzf_layout "$fzf_layout --scrollbar=|"
+        end
+
+        if string match -rq -- '--info=' $fzf_help
+            set fzf_layout "$fzf_layout --info=right"
+        end
+
+        if string match -rq -- '--height=' $fzf_help
+            set fzf_layout "$fzf_layout --height=100%"
+        end
+
+        if string match -rq -- '--preview-window' $fzf_help
+            if string match -rq -- 'border-rounded' $fzf_help
+                set fzf_layout "$fzf_layout --preview-window=right:50%:border-rounded"
+            else
+                set fzf_layout "$fzf_layout --preview-window=right:50%"
+            end
+        end
+
+        set -gx FZF_DEFAULT_OPTS "$fzf_color $fzf_layout --ansi --preview '$FZF_PREVIEW_SCRIPT {}'"
 
         if type -q fd
             set -gx FZF_DEFAULT_COMMAND 'fd --hidden --follow --exclude .git --exclude node_modules --exclude venv --exclude .venv'
