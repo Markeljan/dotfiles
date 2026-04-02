@@ -344,7 +344,7 @@ install_optional_toolchains() {
     install_via_script_if_missing \
       bun \
       bun \
-      'curl -fsSL https://bun.sh/install | bash'
+      'mkdir -p "$HOME/.bun" && env BUN_INSTALL="$HOME/.bun" SHELL=sh bash -lc '\''curl -fsSL https://bun.sh/install | bash'\'''
   else
     warn "unzip is required to install bun; skipping bun"
   fi
@@ -461,7 +461,7 @@ install_fish_plugins() {
         fisher install \$plugins
       end
     end
-  "
+  " </dev/null
 }
 
 set_default_fish_shell() {

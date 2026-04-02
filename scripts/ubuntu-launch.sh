@@ -226,17 +226,17 @@ run_as_target_user() {
   )
 
   if [ "$(id -un)" = "$TARGET_USER" ] && [ "${HOME:-}" = "$TARGET_HOME" ]; then
-    env "${env_args[@]}" bash -lc "$command"
+    env "${env_args[@]}" bash -lc "$command" </dev/null
     return
   fi
 
   if have sudo; then
-    sudo -Hu "$TARGET_USER" env "${env_args[@]}" bash -lc "$command"
+    sudo -Hu "$TARGET_USER" env "${env_args[@]}" bash -lc "$command" </dev/null
     return
   fi
 
   if [ "$(id -u)" -eq 0 ] && have runuser; then
-    runuser -u "$TARGET_USER" -- env "${env_args[@]}" bash -lc "$command"
+    runuser -u "$TARGET_USER" -- env "${env_args[@]}" bash -lc "$command" </dev/null
     return
   fi
 
