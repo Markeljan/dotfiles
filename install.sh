@@ -216,10 +216,9 @@ detect_package_manager() {
 
 ensure_homebrew() {
   local brew_path
+  local os_name
 
-  if [ "$(uname -s)" != "Darwin" ]; then
-    return
-  fi
+  os_name="$(uname -s)"
 
   brew_path="$(brew_executable || true)"
   if [ -n "$brew_path" ]; then
@@ -227,8 +226,23 @@ ensure_homebrew() {
     return
   fi
 
+  case "$os_name" in
+    Darwin)
+      ;;
+    Linux)
+      if have apt-get || have dnf || have pacman; then
+        return
+      fi
+
+      log "no supported Linux package manager found; bootstrapping Homebrew"
+      ;;
+    *)
+      return
+      ;;
+  esac
+
   if ! have curl; then
-    warn "curl is required to bootstrap Homebrew on macOS"
+    warn "curl is required to bootstrap Homebrew"
     return
   fi
 

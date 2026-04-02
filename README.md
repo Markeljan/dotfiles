@@ -27,7 +27,7 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-On macOS, `install.sh` now bootstraps Homebrew automatically when it is not already installed, then installs the rest of the toolchain.
+On macOS, and on Linux hosts without `apt-get`, `dnf`, or `pacman`, `install.sh` bootstraps Homebrew automatically when it is not already installed, then installs the rest of the toolchain. The managed fish env already loads `/home/linuxbrew/.linuxbrew/bin/brew` when Linuxbrew is present, so no manual fish config edit is required after the installer runs.
 
 If the shell was not changed automatically, make sure `fish` is listed in `/etc/shells` and then run:
 
@@ -171,6 +171,7 @@ The installer also runs `Lazy restore` headlessly so the plugins are installed d
 ## Notes
 
 - `install.sh` supports `brew`, `apt-get`, `dnf`, and `pacman`.
+- When a Linux host does not have `apt-get`, `dnf`, or `pacman`, the installer falls back to the official Homebrew bootstrap and evaluates `brew shellenv` for the current run.
 - On Debian-family systems, the installer retries `apt-get update` after refreshing the GitHub CLI signing key when a stale `cli.github.com` source is already configured on the machine.
 - On macOS and Linux, the installer tries to add the detected `fish` binary to `/etc/shells` before it calls `chsh`.
 - The installer skips login-shell changes automatically when it is running without a TTY. Use the Ubuntu launch script if you want that part handled non-interactively.
