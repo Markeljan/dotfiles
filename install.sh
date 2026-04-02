@@ -446,6 +446,10 @@ install_fish_plugins() {
     if test -f ~/.config/fish/fish_plugins
       set -l plugins
       for plugin in (string match -rv '^\s*(#|$)' < ~/.config/fish/fish_plugins)
+        if test "\$plugin" = 'jorgebucaran/fisher'
+          continue
+        end
+
         if test \"$supports_fzf_fish\" -eq 0 -a \"\$plugin\" = 'patrickf1/fzf.fish'
           continue
         end
