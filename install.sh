@@ -370,15 +370,11 @@ install_optional_toolchains() {
   if have fnm; then
     eval "$(fnm env --shell bash)"
 
-    if ! have node; then
-      local current_node
-      log "installing Node.js LTS with fnm"
-      fnm install --lts
-      current_node="$(fnm current || true)"
-
-      if [ -n "$current_node" ] && [ "$current_node" != "system" ]; then
-        fnm default "$current_node"
-      fi
+    log "installing Node.js LTS with fnm and setting as default"
+    fnm install --lts --use
+    current_node="$(fnm current || true)"
+    if [ -n "$current_node" ] && [ "$current_node" != "system" ]; then
+      fnm default "$current_node"
     fi
 
     if have corepack; then
