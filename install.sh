@@ -382,7 +382,7 @@ install_optional_toolchains() {
     fi
 
     if have corepack; then
-      corepack enable || warn "corepack enable failed"
+      corepack enable || run_sudo corepack enable || warn "corepack enable failed"
     fi
   fi
 }
