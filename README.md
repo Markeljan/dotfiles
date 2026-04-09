@@ -116,8 +116,7 @@ The committed `fish` setup keeps the portable parts of the current machine:
 - common PATH entries for local toolchains
 - `fzf` defaults and preview support
 - `pnpm`, `bun`, `python`, and `git` aliases
-- `eza`-based `ls` aliases when `eza` is present
-- `zoxide`, `starship`, `direnv`, and `fnm` initialization when installed
+- `zoxide` and `starship` initialization when installed
 - simple fish keybindings for undo/redo
 
 The committed `neovim` setup keeps the spirit of your current config but fixes the portable parts:

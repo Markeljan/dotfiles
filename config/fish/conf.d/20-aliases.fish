@@ -22,7 +22,6 @@ if status is-interactive
     __dotfiles_abbr brl "bun run lint"
     __dotfiles_abbr brf "bun run format"
 
-    __dotfiles_abbr gst "git status"
     __dotfiles_abbr gfl "git fetch && git pull"
     __dotfiles_abbr dclaude "claude --dangerously-skip-permissions"
     __dotfiles_abbr dcodex "codex --dangerously-bypass-approvals-and-sandbox"
@@ -30,21 +29,6 @@ if status is-interactive
     if type -q python3
         alias py="python3"
         alias python="python3"
-    end
-
-    if type -q eza
-        alias l="eza --group-directories-first -la"
-        alias ls="eza --group-directories-first"
-        alias ll="eza --group-directories-first -la"
-        alias lt="eza --tree --level=2 --group-directories-first"
-    else if type -q exa
-        alias l="exa --group-directories-first -la"
-        alias ls="exa --group-directories-first"
-        alias ll="exa --group-directories-first -la"
-        alias lt="exa --tree --level=2 --group-directories-first"
-    else
-        alias l="ls -la"
-        alias ll="ls -la"
     end
 
     functions --erase __dotfiles_abbr

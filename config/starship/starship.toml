@@ -1,7 +1,7 @@
 "$schema" = "https://starship.rs/config-schema.json"
 
 format = """
-$directory$git_branch$git_status$aws$gcloud$bun$nodejs$python$cmd_duration
+$directory$git_branch$git_status${custom.aws}$gcloud$bun$nodejs$python$cmd_duration
 $character"""
 
 add_newline = false
@@ -20,17 +20,35 @@ format = "[$symbol$branch]($style) "
 style = "yellow"
 format = "([$all_status$ahead_behind]($style) )"
 
-[aws]
-symbol = "aws:"
+[custom.aws]
+description = "Active AWS shell context"
+shell = ["sh"]
+when = """
+test -n "${AWS_VAULT}${AWS_PROFILE}${AWSU_PROFILE}${AWSUME_PROFILE}${AWS_SSO_PROFILE}${AWS_REGION}${AWS_DEFAULT_REGION}${AWS_ACCESS_KEY_ID}${AWS_SECRET_ACCESS_KEY}${AWS_SESSION_TOKEN}${AWS_WEB_IDENTITY_TOKEN_FILE}${AWS_ROLE_ARN}"
+"""
+command = """
+profile="${AWS_VAULT:-${AWS_PROFILE:-${AWSU_PROFILE:-${AWSUME_PROFILE:-${AWS_SSO_PROFILE:-}}}}}"
+region="${AWS_REGION:-${AWS_DEFAULT_REGION:-}}"
+
+if [ -n "$profile" ] && [ -n "$region" ]; then
+  printf '%s (%s)' "$profile" "$region"
+elif [ -n "$profile" ]; then
+  printf '%s' "$profile"
+elif [ -n "$region" ]; then
+  printf '(%s)' "$region"
+else
+  printf 'env'
+fi
+"""
+format = "[ $output]($style) "
 style = "yellow"
-format = "[$symbol($profile )]($style)"
 
 [gcloud]
-symbol = "gcp:"
-format = "[$symbol$project]($style) "
+symbol = " "
+format = "([ $project]($style) )"
 
 [bun]
-symbol = "bun:"
+symbol = " "
 format = "[$symbol$version]($style) "
 version_format = "${raw}"
 
@@ -53,4 +71,3 @@ format = "[$duration]($style) "
 success_symbol = "[>](bold green)"
 error_symbol = "[>](bold red)"
 vicmd_symbol = "[<](bold yellow)"
-

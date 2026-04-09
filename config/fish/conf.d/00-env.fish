@@ -14,28 +14,16 @@ end
 
 set -gx GOPATH $HOME/go
 set -gx BUN_INSTALL $HOME/.bun
-set -gx FNM_DIR $HOME/.local/share/fnm
 set -gx PNPM_HOME $HOME/.local/share/pnpm
 set -gx CLICOLOR 1
 set -gx HOMEBREW_NO_ENV_HINTS 1
 set -gx FZF_PREVIEW_SCRIPT $HOME/.local/bin/fzf-preview
 
-if type -q nvim
-    set -gx EDITOR nvim
-    set -gx VISUAL nvim
-else
-    set -gx EDITOR vi
-    set -gx VISUAL vi
-end
-
 __dotfiles_add_path $HOME/.local/bin
 __dotfiles_add_path $HOME/bin
-__dotfiles_add_path $HOME/.cargo/bin
 __dotfiles_add_path $HOME/go/bin
-__dotfiles_add_path $HOME/.local/share/fnm
 __dotfiles_add_path $HOME/.bun/bin
 __dotfiles_add_path $HOME/.local/share/pnpm
-__dotfiles_add_path $HOME/.foundry/bin
 
 if test -d $HOME/Library/pnpm
     set -gx PNPM_HOME $HOME/Library/pnpm
