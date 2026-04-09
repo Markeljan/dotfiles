@@ -1,34 +1,45 @@
 # AGENTS.md
 
-This repo is a portable dotfiles baseline. Use it to install a macOS- and Linux-friendly shell environment with `fish` as the primary shell.
+This repo is a minimal chezmoi-managed dotfiles baseline for macOS, Debian, and Ubuntu.
 
 ## Primary workflow
 
 1. Clone the repo.
 2. Run `./install.sh`.
-3. If package installation is not desired, run `./install.sh --link-only`.
-4. If the shell was not changed automatically, add `fish` to `/etc/shells` and run `chsh -s "$(command -v fish)"`.
+3. Use `chezmoi apply` for subsequent updates.
 
 ## Managed targets
 
+- `~/.bash_profile`
+- `~/.bashrc`
+- `~/.zprofile`
+- `~/.zshrc`
+- `~/.config/sh/shared.sh`
+- `~/.config/sh/ssh-tmux.sh`
 - `~/.config/fish/config.fish`
-- `~/.config/fish/fish_plugins`
 - `~/.config/fish/conf.d/*.fish`
-- `~/.config/fish/functions/fish_user_key_bindings.fish`
-- `~/.config/nvim`
+- `~/.config/fish/functions/mkcd.fish`
 - `~/.config/starship.toml`
-- `~/.gitconfig` only when it does not already exist
+- `~/.config/nvim`
 - `~/.tmux.conf`
+- `~/.ssh/config`
+- `~/.ssh/authorized_keys.shared`
+- `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
+- `~/.config/ghostty/config` on macOS only
+
+On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked to `~/.config/ghostty/config`.
 
 ## Constraints
 
-- Keep the repo portable across Linux servers and personal machines.
-- Avoid Mac-only integrations unless they are behind a file existence check.
+- Keep the repo portable across macOS, Debian, and Ubuntu.
+- Do not add plugin frameworks or shell-specific bloat.
+- Keep `fzf` and Neovim customizations focused on the current lightweight workflow.
 - Do not store secrets in the repo.
-- Put machine-specific aliases, SSH shortcuts, and signing config in local override files instead of committed config.
-- Never replace an existing `~/.gitconfig`; preserve the machine's current Git identity.
-- Keep Neovim portable: no committed virtualenvs, no hardcoded per-host paths unless guarded.
+- Keep machine-specific aliases, SSH hosts, and extra keys in local override files.
+- Do not seed host aliases or existing `authorized_keys` entries from the current machine into the repo.
+- Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file.
+- Keep `fish` as the intended login shell and shared SSH `tmux` behavior limited to interactive SSH sessions.
 
 ## Verification
 
@@ -36,16 +47,23 @@ After changes, run:
 
 ```bash
 bash -n install.sh
-bash -n bin/fzf-preview
-for file in config/fish/config.fish config/fish/conf.d/*.fish config/fish/functions/*.fish; do fish -n "$file"; done
-nvim --headless "+Lazy! restore" +qa
+tmp_home="$(mktemp -d)"
+DOTFILES_SKIP_PACKAGES=1 chezmoi init --apply --source "$PWD" --destination "$tmp_home"
+bash -n "$tmp_home/.bashrc"
+zsh -n "$tmp_home/.zshrc"
+for file in "$tmp_home/.config/fish/config.fish" "$tmp_home"/.config/fish/conf.d/*.fish "$tmp_home"/.config/fish/functions/*.fish; do fish -n "$file"; done
+nvim --headless "+qa" || true
+test -f "$tmp_home/.ssh/authorized_keys"
+rm -rf "$tmp_home"
 git diff --stat
 ```
 
 ## Safe extension points
 
-- `~/.config/fish/local.fish`
-- `~/.gitconfig.local`
+- `~/.config/sh/local.sh`
+- `~/.config/fish/conf.d/99-local.fish`
+- `~/.ssh/config.local`
+- `~/.ssh/authorized_keys.local`
 - `~/.tmux.local.conf`
 
 If you add new managed files, update both this document and `README.md`.

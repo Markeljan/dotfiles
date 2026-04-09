@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "${DOTFILES_SKIP_NVIM_BOOTSTRAP:-0}" = "1" ]; then
+  exit 0
+fi
+
+if ! command -v nvim >/dev/null 2>&1; then
+  exit 0
+fi
+
+nvim --headless "+Lazy! sync" +qa >/dev/null 2>&1 || true

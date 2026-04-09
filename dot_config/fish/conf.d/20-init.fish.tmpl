@@ -1,0 +1,19 @@
+if command -q brew
+    brew shellenv | source
+else
+    set -l dotfiles_brew_loaded 0
+    {{- range .shell.brew_candidates }}
+    if test $dotfiles_brew_loaded -eq 0; and test -x "{{ . }}"
+        "{{ . }}" shellenv | source
+        set dotfiles_brew_loaded 1
+    end
+    {{- end }}
+end
+
+if command -q zoxide
+    zoxide init fish | source
+end
+
+if command -q starship
+    starship init fish | source
+end

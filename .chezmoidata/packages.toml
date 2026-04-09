@@ -1,0 +1,49 @@
+[packages.darwin]
+brew = [
+  "bash",
+  "zsh",
+  "fish",
+  "git",
+  "curl",
+  "fd",
+  "fzf",
+  "neovim",
+  "ripgrep",
+  "starship",
+  "zoxide",
+  "tmux",
+]
+
+[packages.debian]
+apt = [
+  "bash",
+  "zsh",
+  "fish",
+  "git",
+  "curl",
+  "fd-find",
+  "fzf",
+  "neovim",
+  "ripgrep",
+  "tmux",
+]
+
+[packages.ubuntu]
+apt = [
+  "bash",
+  "zsh",
+  "fish",
+  "git",
+  "curl",
+  "fd-find",
+  "fzf",
+  "neovim",
+  "ripgrep",
+  "tmux",
+]
+
+[packages.uv]
+tools = []
+
+[packages.bun]
+packages = []

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+shared_file="$HOME/.ssh/authorized_keys.shared"
+local_file="$HOME/.ssh/authorized_keys.local"
+target_file="$HOME/.ssh/authorized_keys"
+temp_file="$(mktemp)"
+
+cleanup() {
+  rm -f "$temp_file"
+}
+
+trap cleanup EXIT
+
+mkdir -p "$HOME/.ssh"
+
+if [ ! -e "$shared_file" ]; then
+  : > "$shared_file"
+  chmod 600 "$shared_file"
+fi
+
+if [ -f "$target_file" ]; then
+  cat "$target_file" >> "$temp_file"
+fi
+
+if [ -f "$shared_file" ]; then
+  cat "$shared_file" >> "$temp_file"
+fi
+
+if [ -f "$local_file" ]; then
+  cat "$local_file" >> "$temp_file"
+fi
+
+awk 'NF && !seen[$0]++ { print }' "$temp_file" > "${temp_file}.filtered" || true
+mv "${temp_file}.filtered" "$temp_file"
+
+if [ -s "$temp_file" ]; then
+  printf '\n' >> "$temp_file"
+else
+  : > "$temp_file"
+fi
+
+mv "$temp_file" "$target_file"
+chmod 600 "$target_file"

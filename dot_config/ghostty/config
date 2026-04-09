@@ -1,0 +1,32 @@
+# This is the configuration file for Ghostty.
+
+# Keybindings
+keybind = cmd+n=new_tab
+keybind = cmd+shift+n=new_window
+# cmd+s write file vim
+keybind = super+s=text:\x1b:w\n
+keybind = super+s=text:\x1b:x\n
+
+# SSH
+shell-integration = detect
+shell-integration-features = ssh-terminfo,ssh-env,no-cursor
+
+# Appearance
+theme = dark modern
+bold-color = bright
+window-colorspace = display-p3
+background-opacity = 0.8
+unfocused-split-opacity = 1
+cursor-style = block
+cursor-style-blink = true
+font-family = "MartianMono NFM"
+font-size = 13
+
+macos-titlebar-style = transparent
+macos-option-as-alt = true
+macos-non-native-fullscreen = true
+macos-titlebar-proxy-icon = hidden
+
+window-new-tab-position = end
+window-save-state = never
+quit-after-last-window-closed = false

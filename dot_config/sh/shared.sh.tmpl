@@ -1,0 +1,59 @@
+path_prepend() {
+  case ":${PATH:-}:" in
+    *":$1:"*) ;;
+    *)
+      if [ -n "${PATH:-}" ]; then
+        PATH="$1:$PATH"
+      else
+        PATH="$1"
+      fi
+      export PATH
+      ;;
+  esac
+}
+
+dotfiles_have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+dotfiles_init_brew() {
+  local brew_bin
+
+  if dotfiles_have brew; then
+    eval "$(brew shellenv)"
+    return
+  fi
+
+  {{- range .shell.brew_candidates }}
+  if [ -x "{{ . }}" ]; then
+    brew_bin="{{ . }}"
+    eval "$("$brew_bin" shellenv)"
+    return
+  fi
+  {{- end }}
+}
+
+dotfiles_set_ssh_agent() {
+  if [ -S "$HOME/{{ .shell.ssh_agent_socket }}" ]; then
+    export SSH_AUTH_SOCK="$HOME/{{ .shell.ssh_agent_socket }}"
+  fi
+}
+
+mkcd() {
+  if [ "$#" -eq 0 ]; then
+    printf 'mkcd: missing directory\n' >&2
+    return 1
+  fi
+
+  mkdir -p -- "$1" && cd -- "$1"
+}
+
+dotfiles_init_brew
+{{- range .shell.path_entries }}
+path_prepend "$HOME/{{ . }}"
+{{- end }}
+dotfiles_set_ssh_agent
+
+{{- range .shell.aliases }}
+alias {{ .name }}='{{ .expansion }}'
+{{- end }}

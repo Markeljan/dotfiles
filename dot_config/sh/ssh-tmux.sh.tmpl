@@ -1,0 +1,21 @@
+dotfiles_auto_tmux_attach() {
+  if [ -n "${TMUX:-}" ]; then
+    return
+  fi
+
+  if [ -z "${SSH_CONNECTION:-}" ]; then
+    return
+  fi
+
+  if [ -n "${SSH_ORIGINAL_COMMAND:-}" ]; then
+    return
+  fi
+
+  if ! command -v tmux >/dev/null 2>&1; then
+    return
+  fi
+
+  exec tmux new-session -A -s "{{ .shell.tmux.ssh_session_name }}"
+}
+
+dotfiles_auto_tmux_attach

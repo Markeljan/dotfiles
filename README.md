@@ -1,179 +1,190 @@
 # Dotfiles
 
-Portable dotfiles for a macOS and Linux development setup with `fish` as the default shell.
+Minimal [chezmoi](https://www.chezmoi.io/) dotfiles for macOS, Debian, and Ubuntu.
 
-This repo is intentionally narrow:
+## Quick Start
 
-- Keep the useful baseline from the current machine.
-- Skip Mac-only and host-specific helpers.
-- Stay safe to install on a VPS, laptop, or fresh workstation.
+This repo is the chezmoi source directory.
 
-## What this repo manages
-
-- `fish` shell config
-- `fisher` + `fzf.fish`
-- `neovim` with Neo-tree and ToggleTerm
-- `starship` prompt
-- `git` defaults for machines that do not already have `~/.gitconfig`
-- `tmux` baseline
-- `fzf` preview helper
-- A single install script that installs packages, links config, installs fish plugins, and tries to switch the default shell to `fish`
-
-## Quick start
+Install on a new machine:
 
 ```bash
-git clone <your-private-dotfiles-repo> ~/dotfiles
+git clone <repo-url> ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
 
-On macOS, and on Linux hosts without `apt-get`, `dnf`, or `pacman`, `install.sh` bootstraps Homebrew automatically when it is not already installed, then installs the rest of the toolchain. The managed fish env already loads `/home/linuxbrew/.linuxbrew/bin/brew` when Linuxbrew is present, so no manual fish config edit is required after the installer runs.
-
-If the shell was not changed automatically, make sure `fish` is listed in `/etc/shells` and then run:
+Apply repo changes after editing or pulling:
 
 ```bash
-echo "$(command -v fish)" | sudo tee -a /etc/shells
-chsh -s "$(command -v fish)"
+cd ~/dotfiles
+chezmoi diff
+chezmoi apply
 ```
 
-For a link-only install:
+Update from Git and re-apply:
 
 ```bash
-./install.sh --link-only
+cd ~/dotfiles
+git pull --ff-only
+chezmoi apply
 ```
 
-For package installation only:
+Skip package installation when testing:
 
 ```bash
-./install.sh --packages-only
+DOTFILES_SKIP_PACKAGES=1 ./install.sh
 ```
 
-## Ubuntu launch script
+## How To Change Things
 
-For Ubuntu instances, [`scripts/ubuntu-launch.sh`](scripts/ubuntu-launch.sh) is
-standalone so it can be:
-
-- copied directly into AWS Lightsail launch scripts or cloud-init user data
-- piped from GitHub with `curl ... | sudo bash`
-- run locally on an existing Ubuntu machine as a one-shot bootstrap
-
-It defaults to this repo and runs the full installer non-interactively:
-
-- `DOTFILES_REPO` defaults to `https://github.com/markeljan/dotfiles.git`
-- `DOTFILES_REF` defaults to `main`
-- `TARGET_USER` auto-detects the right login user and falls back to the first regular account if needed
-- `SET_LOGIN_SHELL` defaults to `1`; set it to `0` to keep the existing login shell
-- `INSTALL_FLAGS` defaults to empty, and the launch script always adds `--skip-default-shell` before calling `./install.sh` because it updates the login shell itself afterward
-
-The script:
-
-- runs `apt-get update` and `apt-get upgrade`
-- installs `ca-certificates`, `curl`, `git`, and `sudo`
-- syncs the dotfiles repo into `$HOME/dotfiles` for the target user
-- runs `./install.sh` as the target user
-- adds `fish` to `/etc/shells` when needed
-- sets the target user's login shell to `fish` without an interactive `chsh` prompt
-- writes a log to `/var/log/dotfiles-launch.log` when run as root, or `~/dotfiles-launch.log` otherwise
-
-Copy-paste example for an existing Ubuntu machine:
+Edit the files in this repo, then apply them:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/markeljan/dotfiles/main/scripts/ubuntu-launch.sh | sudo bash
+cd ~/dotfiles
+$EDITOR dot_zshrc.tmpl
+chezmoi diff
+chezmoi apply
 ```
 
-Copy-paste example with overrides:
+Useful chezmoi commands:
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/markeljan/dotfiles/main/scripts/ubuntu-launch.sh | \
-  sudo TARGET_USER=ubuntu DOTFILES_REF=main SET_LOGIN_SHELL=0 INSTALL_FLAGS="--skip-lang-tools" bash
-```
+- `chezmoi diff` shows pending home-directory changes before you apply them.
+- `chezmoi apply` writes the managed files to your home directory.
+- `chezmoi status` shows which managed files differ.
+- `chezmoi managed` lists the files managed by chezmoi.
 
-Cloud-init or Lightsail launch script example:
+`install.sh` does three things:
 
-```bash
-#!/bin/bash
-set -euo pipefail
-curl -fsSL https://raw.githubusercontent.com/markeljan/dotfiles/main/scripts/ubuntu-launch.sh | bash
-```
+1. installs `chezmoi` if it is missing
+2. runs `chezmoi init --apply --source="$PWD"`
+3. tries to set `fish` as the login shell
 
-If you want a different account than the auto-detected one, set `TARGET_USER`.
+If the login shell update cannot complete automatically, the script prints the exact manual commands to run.
 
-Notes:
+## What This Repo Manages
 
-- The launch script is safe to re-run; it re-syncs the repo to the requested ref before it invokes the installer.
-- If you prefer to keep the existing login shell on a server, set `SET_LOGIN_SHELL=0`.
-- If the login shell was not changed automatically on a custom image, run this after login:
+This repo stays intentionally small:
 
-```bash
-echo "$(command -v fish)" | sudo tee -a /etc/shells
-chsh -s "$(command -v fish)"
-```
+- macOS, Debian, and Ubuntu support
+- bash, zsh, and fish shell configs from one shared data model
+- minimal `starship` prompt
+- `fzf` preview configuration and `fzf-preview`
+- `tmux` baseline with SSH-only auto-attach to a persistent `main` session
+- SSH client config with optional 1Password agent wiring
+- append-safe `authorized_keys` generation from shared and local files
+- minimal Neovim with a left file tree and editor pane
+- package bootstrap with Homebrew, APT, `uv`, and `bun`
+- minimal Ghostty config on macOS only
 
-## Included baseline
+## Managed files
 
-The committed `fish` setup keeps the portable parts of the current machine:
+- `~/.bash_profile`
+- `~/.bashrc`
+- `~/.zprofile`
+- `~/.zshrc`
+- `~/.config/sh/shared.sh`
+- `~/.config/sh/ssh-tmux.sh`
+- `~/.config/fish/config.fish`
+- `~/.config/fish/conf.d/*.fish`
+- `~/.config/fish/functions/mkcd.fish`
+- `~/.config/starship.toml`
+- `~/.config/nvim`
+- `~/.tmux.conf`
+- `~/.ssh/config`
+- `~/.ssh/authorized_keys.shared`
+- `~/.ssh/authorized_keys`
+- `~/.local/bin/fzf-preview`
+- `~/.config/ghostty/config`
 
-- common PATH entries for local toolchains
-- `fzf` defaults and preview support
-- `pnpm`, `bun`, `python`, and `git` aliases
-- `zoxide` and `starship` initialization when installed
-- simple fish keybindings for undo/redo
+On macOS, chezmoi also creates a symlink from:
 
-The committed `neovim` setup keeps the spirit of your current config but fixes the portable parts:
+- `~/Library/Application Support/com.mitchellh.ghostty/config`
 
-- `lazy.nvim` plugin manager
-- `neo-tree` sidebar on the left
-- `toggleterm` terminal available on demand at the bottom
-- no terminal auto-open on startup
-- opens into the file editor after the tree is shown
-- uses `fish` as the shell when `fish` is installed
-- removes the hardcoded Python virtualenv dependency from the old config
+to:
 
-The repo does not include:
+- `~/.config/ghostty/config`
 
-- machine-specific SSH shortcuts
-- display-management aliases
-- OrbStack integration
-- 1Password signing setup
-- editor launch helpers tied to a specific GUI app
-- the old `~/.config/nvim/env` virtualenv
+## Shared shell baseline
+
+The shared shell model lives in `.chezmoidata/shell.toml`.
+
+v1 keeps the shell layer intentionally plain, with a few restored workflow helpers:
+
+- shared PATH entries for `~/.local/bin` and `~/.bun/bin`
+- optional `brew shellenv`
+- optional 1Password SSH agent export via `~/.1password/agent.sock`
+- optional `zoxide` and `starship` initialization
+- one shared function: `mkcd`
+- bun shortcuts: `b`, `bi`, `br`, `bx`
+- git shortcuts: `gst`, `gfl`
+- pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`
+- Claude/Codex shortcuts: `dclaude`, `dcodex`
+
+fish uses `abbr`. bash and zsh use aliases.
+
+`fzf` is configured with a right-hand 50% preview split and `~/.local/bin/fzf-preview`.
+
+## SSH and tmux behavior
+
+`~/.ssh/config` is repo-managed and includes:
+
+- generic client defaults
+- `~/.ssh/config.local` when present
+- `~/.ssh/1Password/config` when present
+
+`IdentityAgent ~/.1password/agent.sock` is enabled only when the socket exists.
+
+`authorized_keys` is generated on every `chezmoi apply` from:
+
+- the existing `~/.ssh/authorized_keys` file
+- shared base: `~/.ssh/authorized_keys.shared`
+- optional local append file: `~/.ssh/authorized_keys.local`
+
+Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten.
+
+Interactive SSH logins auto-attach to a shared `tmux` session named `main` when:
+
+- the shell is interactive
+- `SSH_CONNECTION` is set
+- `TMUX` is not already set
+- `SSH_ORIGINAL_COMMAND` is not set
+
+Disconnecting the SSH client detaches from `tmux`; it does not kill the session.
+
+## Packages
+
+Package definitions live in `.chezmoidata/packages.toml`.
+
+- macOS uses Homebrew
+- Debian and Ubuntu use APT
+- `uv` installs through the official Astral installer
+- `bun` installs through the official Bun installer
+- `neovim` installs through the system package manager
+
+Set `DOTFILES_SKIP_PACKAGES=1` when you want to test or apply the repo without running package installs.
 
 ## Local overrides
 
 Keep machine-specific changes outside the repo:
 
-- `~/.config/fish/local.fish`
-- `~/.gitconfig.local`
+- `~/.config/sh/local.sh`
+- `~/.config/fish/conf.d/99-local.fish`
+- `~/.ssh/config.local`
+- `~/.ssh/authorized_keys.local`
 - `~/.tmux.local.conf`
 
-The committed configs already include hooks for those files.
-Use `config/git/gitconfig.local.example` as a starting point for signing or other private git settings.
+## Daily usage
 
-## Git behavior
+After the first install:
 
-If `~/.gitconfig` already exists, `install.sh` leaves it untouched. That keeps VPS-specific Git identities or host-specific signing setups intact.
+```bash
+chezmoi apply
+```
 
-If `~/.gitconfig` does not exist, the installer links in the baseline from this repo.
+If this repo is your chezmoi source directory and you pull new changes into it:
 
-## Neovim behavior
-
-This setup is intentionally simple and closer to a file browser than a traditional Vim workflow:
-
-- the tree opens on the left at startup
-- the main edit buffer stays active
-- the terminal does not open by default
-- `,e` toggles the tree
-- `,t` or `Ctrl-\\` toggles the bottom terminal
-
-The installer also runs `Lazy restore` headlessly so the plugins are installed during bootstrap when `nvim` is present.
-
-## Notes
-
-- `install.sh` supports `brew`, `apt-get`, `dnf`, and `pacman`.
-- When a Linux host does not have `apt-get`, `dnf`, or `pacman`, the installer falls back to the official Homebrew bootstrap and evaluates `brew shellenv` for the current run.
-- On Debian-family systems, the installer retries `apt-get update` after refreshing the GitHub CLI signing key when a stale `cli.github.com` source is already configured on the machine.
-- On macOS and Linux, the installer tries to add the detected `fish` binary to `/etc/shells` before it calls `chsh`.
-- The installer skips login-shell changes automatically when it is running without a TTY. Use the Ubuntu launch script if you want that part handled non-interactively.
-- On Linux, if the distro `neovim` package is older than `0.8`, the installer falls back to the official stable release under `~/.local/share/neovim-stable` and symlinks `~/.local/bin/nvim`.
-- When a distro package is missing, the script falls back to official installers for a few userland tools such as `starship`, `zoxide`, `fnm`, and `bun`.
-- On Debian-family systems, the installer creates `~/.local/bin/fd` and `~/.local/bin/bat` symlinks when only `fdfind` or `batcat` exist.
+```bash
+git pull --ff-only
+chezmoi apply
+```
