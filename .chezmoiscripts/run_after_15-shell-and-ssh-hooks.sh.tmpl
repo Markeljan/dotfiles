@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+append_block_if_missing() {
+  local file_path="$1"
+  local source_path="$2"
+  local marker_name="$3"
+  local skip_pattern="${4:-}"
+  local start_marker="# >>> dotfiles ${marker_name} >>>"
+  local end_marker="# <<< dotfiles ${marker_name} <<<"
+
+  if [ ! -f "$file_path" ]; then
+    return
+  fi
+
+  if grep -Fq "$start_marker" "$file_path" || grep -Fq "$source_path" "$file_path"; then
+    return
+  fi
+
+  if [ -n "$skip_pattern" ] && grep -Fq "$skip_pattern" "$file_path"; then
+    return
+  fi
+
+  cat >> "$file_path" <<EOF
+
+$start_marker
+if [ -f "\$HOME/$source_path" ]; then
+  . "\$HOME/$source_path"
+fi
+$end_marker
+EOF
+}
+
+ensure_ssh_includes() {
+  local config_path="$HOME/.ssh/config"
+  local marker_start="# >>> dotfiles ssh >>>"
+
+  if [ ! -f "$config_path" ]; then
+    mkdir -p "$HOME/.ssh"
+    cat > "$config_path" <<'EOF'
+# Local top-level SSH config created by dotfiles.
+Include ~/.orbstack/ssh/config
+Include ~/.ssh/1Password/config
+Include ~/.ssh/config.shared
+Include ~/.ssh/config.local
+EOF
+    chmod 600 "$config_path"
+    return
+  fi
+
+  if grep -Fq "$marker_start" "$config_path" || grep -Fq "Include ~/.ssh/config.shared" "$config_path"; then
+    return
+  fi
+
+  python3 - "$config_path" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+lines = path.read_text().splitlines(keepends=True)
+block = [
+    "# >>> dotfiles ssh >>>\n",
+    "Include ~/.ssh/config.shared\n",
+    "Include ~/.ssh/config.local\n",
+    "# <<< dotfiles ssh <<<\n",
+]
+
+insert_at = len(lines)
+for index, line in enumerate(lines):
+    stripped = line.lstrip()
+    if stripped.startswith("Host ") or stripped.startswith("Match "):
+        insert_at = index
+        break
+
+if insert_at > 0 and lines[insert_at - 1].strip():
+    block.insert(0, "\n")
+
+if insert_at < len(lines) and lines[insert_at].strip():
+    block.append("\n")
+
+lines[insert_at:insert_at] = block
+path.write_text("".join(lines))
+PY
+}
+
+append_block_if_missing "$HOME/.zshrc" ".config/sh/zshrc" "zsh" ".config/sh/shared.sh"
+append_block_if_missing "$HOME/.bashrc" ".config/sh/bashrc" "bash" ".config/sh/shared.sh"
+append_block_if_missing "$HOME/.zprofile" ".config/sh/zprofile" "zprofile" '.profile'
+append_block_if_missing "$HOME/.bash_profile" ".config/sh/bash_profile" "bash_profile" '.bashrc'
+ensure_ssh_includes

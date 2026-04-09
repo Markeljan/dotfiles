@@ -1,0 +1,3 @@
+if [ -f "$HOME/.config/sh/zprofile" ]; then
+  . "$HOME/.config/sh/zprofile"
+fi

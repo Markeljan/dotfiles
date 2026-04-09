@@ -2,6 +2,9 @@
 fish_add_path -p "$HOME/{{ . }}"
 {{- end }}
 
-if test -S "$HOME/{{ .shell.ssh_agent_socket }}"
-    set -gx SSH_AUTH_SOCK "$HOME/{{ .shell.ssh_agent_socket }}"
+for socket in {{- range .shell.ssh_agent_sockets }} "$HOME/{{ . }}"{{- end }}
+    if test -S "$socket"
+        set -gx SSH_AUTH_SOCK "$socket"
+        break
+    end
 end

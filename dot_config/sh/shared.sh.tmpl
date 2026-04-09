@@ -34,9 +34,15 @@ dotfiles_init_brew() {
 }
 
 dotfiles_set_ssh_agent() {
-  if [ -S "$HOME/{{ .shell.ssh_agent_socket }}" ]; then
-    export SSH_AUTH_SOCK="$HOME/{{ .shell.ssh_agent_socket }}"
+  local socket
+
+  {{- range .shell.ssh_agent_sockets }}
+  socket="$HOME/{{ . }}"
+  if [ -S "$socket" ]; then
+    export SSH_AUTH_SOCK="$socket"
+    return
   fi
+  {{- end }}
 }
 
 mkcd() {

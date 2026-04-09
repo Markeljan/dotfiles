@@ -10,10 +10,10 @@ This repo is a minimal chezmoi-managed dotfiles baseline for macOS, Debian, and 
 
 ## Managed targets
 
-- `~/.bash_profile`
-- `~/.bashrc`
-- `~/.zprofile`
-- `~/.zshrc`
+- `~/.config/sh/bash_profile`
+- `~/.config/sh/bashrc`
+- `~/.config/sh/zprofile`
+- `~/.config/sh/zshrc`
 - `~/.config/sh/shared.sh`
 - `~/.config/sh/ssh-tmux.sh`
 - `~/.config/fish/config.fish`
@@ -22,11 +22,13 @@ This repo is a minimal chezmoi-managed dotfiles baseline for macOS, Debian, and 
 - `~/.config/starship.toml`
 - `~/.config/nvim`
 - `~/.tmux.conf`
-- `~/.ssh/config`
+- `~/.ssh/config.shared`
 - `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config` on macOS only
+
+Top-level shell files are created when missing. `~/.ssh/config` is created by a post-apply hook when missing. If they already exist, they are preserved and may receive a small source/include hook instead of being replaced.
 
 On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked to `~/.config/ghostty/config`.
 
@@ -39,6 +41,7 @@ On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked
 - Keep machine-specific aliases, SSH hosts, and extra keys in local override files.
 - Do not seed host aliases or existing `authorized_keys` entries from the current machine into the repo.
 - Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file.
+- Preserve existing top-level shell rc files and SSH config when a shared-file alternative is available.
 - Keep `fish` as the intended login shell and shared SSH `tmux` behavior limited to interactive SSH sessions.
 
 ## Verification

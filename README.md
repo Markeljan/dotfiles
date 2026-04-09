@@ -79,10 +79,10 @@ This repo stays intentionally small:
 
 ## Managed files
 
-- `~/.bash_profile`
-- `~/.bashrc`
-- `~/.zprofile`
-- `~/.zshrc`
+- `~/.config/sh/bash_profile`
+- `~/.config/sh/bashrc`
+- `~/.config/sh/zprofile`
+- `~/.config/sh/zshrc`
 - `~/.config/sh/shared.sh`
 - `~/.config/sh/ssh-tmux.sh`
 - `~/.config/fish/config.fish`
@@ -91,7 +91,7 @@ This repo stays intentionally small:
 - `~/.config/starship.toml`
 - `~/.config/nvim`
 - `~/.tmux.conf`
-- `~/.ssh/config`
+- `~/.ssh/config.shared`
 - `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
@@ -104,6 +104,8 @@ On macOS, chezmoi also creates a symlink from:
 to:
 
 - `~/.config/ghostty/config`
+
+If `~/.bashrc`, `~/.zshrc`, `~/.bash_profile`, `~/.zprofile`, or `~/.ssh/config` already exist, this repo preserves them. New machines get minimal create-only files, and existing machines get a small source/include hook when needed instead of a full replacement.
 
 ## Shared shell baseline
 
@@ -127,13 +129,20 @@ fish uses `abbr`. bash and zsh use aliases.
 
 ## SSH and tmux behavior
 
-`~/.ssh/config` is repo-managed and includes:
+`~/.ssh/config.shared` is repo-managed and contains:
 
 - generic client defaults
-- `~/.ssh/config.local` when present
-- `~/.ssh/1Password/config` when present
+- optional 1Password SSH agent wiring for both `~/.1password/agent.sock` and the macOS Group Containers socket path
 
-`IdentityAgent ~/.1password/agent.sock` is enabled only when the socket exists.
+`~/.ssh/config` is treated as local. On machines where it already exists, dotfiles adds:
+
+- `Include ~/.ssh/config.shared`
+- `Include ~/.ssh/config.local`
+
+On machines with no existing `~/.ssh/config`, the post-apply hook creates a minimal top-level file that also includes:
+
+- `Include ~/.orbstack/ssh/config`
+- `Include ~/.ssh/1Password/config`
 
 `authorized_keys` is generated on every `chezmoi apply` from:
 
@@ -161,6 +170,8 @@ Package definitions live in `.chezmoidata/packages.toml`.
 - `uv` installs through the official Astral installer
 - `bun` installs through the official Bun installer
 - `neovim` installs through the system package manager
+
+On macOS, the package bootstrap no longer installs Homebrew `bash` or `zsh`. The system shells are sufficient, and `fish` remains the primary shell.
 
 Set `DOTFILES_SKIP_PACKAGES=1` when you want to test or apply the repo without running package installs.
 

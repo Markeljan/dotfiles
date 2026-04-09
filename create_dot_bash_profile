@@ -1,0 +1,3 @@
+if [ -f "$HOME/.config/sh/bash_profile" ]; then
+  . "$HOME/.config/sh/bash_profile"
+fi
