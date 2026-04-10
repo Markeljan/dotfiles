@@ -51,13 +51,13 @@ Useful chezmoi commands:
 
 - `chezmoi diff` shows pending home-directory changes before you apply them.
 - `chezmoi apply` writes the managed files to your home directory.
-- `chezmoi status` shows which managed files differ.
+- `chezmoi status --exclude=scripts` shows which managed files differ.
 - `chezmoi managed` lists the files managed by chezmoi.
 
 `install.sh` does three things:
 
 1. installs `chezmoi` if it is missing
-2. runs `chezmoi init --apply --source="$PWD"`
+2. runs `chezmoi init --apply --force --source="$PWD"`
 3. tries to set `fish` as the login shell
 
 If the login shell update cannot complete automatically, the script prints the exact manual commands to run.
@@ -92,7 +92,6 @@ This repo stays intentionally small:
 - `~/.config/nvim`
 - `~/.tmux.conf`
 - `~/.ssh/config.shared`
-- `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config`
@@ -147,10 +146,10 @@ On machines with no existing `~/.ssh/config`, the post-apply hook creates a mini
 `authorized_keys` is generated on every `chezmoi apply` from:
 
 - the existing `~/.ssh/authorized_keys` file
-- shared base: `~/.ssh/authorized_keys.shared`
+- shared base: `~/.ssh/authorized_keys.shared` if present
 - optional local append file: `~/.ssh/authorized_keys.local`
 
-Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten.
+Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten. If `~/.ssh/authorized_keys.shared` does not exist yet, the post-apply hook creates it as an empty local file.
 
 Interactive SSH logins auto-attach to a shared `tmux` session named `main` when:
 

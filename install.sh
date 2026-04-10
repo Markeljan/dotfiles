@@ -79,6 +79,37 @@ add_shell_to_etc_shells() {
   return 1
 }
 
+dedupe_etc_shells() {
+  local temp_file
+
+  if [ ! -r /etc/shells ]; then
+    return 0
+  fi
+
+  temp_file="$(mktemp)"
+  awk '!seen[$0]++' /etc/shells > "$temp_file"
+
+  if cmp -s "$temp_file" /etc/shells; then
+    rm -f "$temp_file"
+    return 0
+  fi
+
+  if [ "$(id -u)" -eq 0 ]; then
+    cp "$temp_file" /etc/shells
+    rm -f "$temp_file"
+    return 0
+  fi
+
+  if have sudo && sudo -n true 2>/dev/null; then
+    sudo cp "$temp_file" /etc/shells
+    rm -f "$temp_file"
+    return 0
+  fi
+
+  rm -f "$temp_file"
+  return 0
+}
+
 set_fish_login_shell() {
   local fish_path current_shell
 
@@ -87,6 +118,8 @@ set_fish_login_shell() {
     warn "fish is not installed; skipping login shell update"
     return 1
   fi
+
+  dedupe_etc_shells
 
   current_shell="$(current_login_shell)"
   if [ "$current_shell" = "$fish_path" ]; then
@@ -132,7 +165,7 @@ main() {
   install_chezmoi
 
   log "applying chezmoi source from $REPO_DIR"
-  chezmoi init --apply --source="$REPO_DIR"
+  chezmoi init --apply --force --source="$REPO_DIR"
 
   set_fish_login_shell || true
 }
