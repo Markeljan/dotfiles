@@ -250,7 +250,7 @@ On machines with no existing `~/.ssh/config`, the post-apply hook creates a mini
 
 Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten. If `~/.ssh/authorized_keys.shared` does not exist yet, the post-apply hook creates it as an empty local file.
 
-When using Ghostty over SSH, the macOS Ghostty config enables `ssh-terminfo`, `ssh-env`, and `sudo` shell integration so Ghostty can install `xterm-ghostty` terminfo remotely, fall back to `xterm-256color` when it cannot, and preserve the terminfo environment through `sudo`. The shared bash, zsh, and fish startup files also downgrade `TERM` to `xterm-256color` if `xterm-ghostty` is not resolvable on the current host.
+When using Ghostty over SSH, the macOS Ghostty config keeps only `sudo` shell integration enabled. The shared bash, zsh, and fish startup files force `TERM=xterm-256color` for SSH sessions and also downgrade to `xterm-256color` on local hosts where `xterm-ghostty` is not resolvable.
 
 ## Packages
 
@@ -260,6 +260,7 @@ Package definitions live in `.chezmoidata/packages.toml`.
 - Debian and Ubuntu use APT for baseline packages and Homebrew for `fnm`
 - Debian and Ubuntu install the Homebrew prerequisites from the official Homebrew docs
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
+- On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer

@@ -140,6 +140,13 @@ dotfiles_set_safe_term() {
     return
   fi
 
+  if [ -n "${SSH_CONNECTION:-}${SSH_CLIENT:-}${SSH_TTY:-}" ]; then
+    TERM="xterm-256color"
+    export TERM
+    unset TERMINFO
+    return
+  fi
+
   if dotfiles_have infocmp && infocmp xterm-ghostty >/dev/null 2>&1; then
     return
   fi

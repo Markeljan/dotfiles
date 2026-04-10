@@ -10,7 +10,10 @@ for socket in {{- range .shell.ssh_agent_sockets }} "$HOME/{{ . }}"{{- end }}
 end
 
 if test "$TERM" = "xterm-ghostty"
-    if not command -q infocmp; or not infocmp xterm-ghostty >/dev/null 2>&1
+    if set -q SSH_CONNECTION; or set -q SSH_CLIENT; or set -q SSH_TTY
+        set -gx TERM xterm-256color
+        set -e TERMINFO
+    else if not command -q infocmp; or not infocmp xterm-ghostty >/dev/null 2>&1
         set -gx TERM xterm-256color
         set -e TERMINFO
     end
