@@ -17,3 +17,9 @@ end
 if command -q starship
     starship init fish | source
 end
+
+if status is-interactive
+    if command -q bun
+        bun completions 2>/dev/null | source
+    end
+end

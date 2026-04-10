@@ -1,5 +1,6 @@
 [packages.darwin]
 brew = [
+  "bash-completion@2",
   "fish",
   "fd",
   "fzf",
@@ -12,6 +13,7 @@ brew = [
 
 [packages.debian]
 apt = [
+  "bash-completion",
   "zsh",
   "fish",
   "git",
@@ -25,6 +27,7 @@ apt = [
 
 [packages.ubuntu]
 apt = [
+  "bash-completion",
   "zsh",
   "fish",
   "git",

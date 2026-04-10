@@ -16,6 +16,96 @@ dotfiles_have() {
   command -v "$1" >/dev/null 2>&1
 }
 
+dotfiles_source_first() {
+  local dotfiles_source_path
+
+  for dotfiles_source_path in "$@"; do
+    if [ -r "$dotfiles_source_path" ]; then
+      . "$dotfiles_source_path"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+dotfiles_brew_prefix() {
+  if [ -n "${HOMEBREW_PREFIX:-}" ] && [ -d "${HOMEBREW_PREFIX:-}" ]; then
+    printf '%s\n' "$HOMEBREW_PREFIX"
+    return 0
+  fi
+
+  if dotfiles_have brew; then
+    brew --prefix 2>/dev/null
+    return
+  fi
+
+  {{- range .shell.brew_candidates }}
+  if [ -x "{{ . }}" ]; then
+    "{{ . }}" --prefix 2>/dev/null
+    return
+  fi
+  {{- end }}
+
+  return 1
+}
+
+dotfiles_bun_root() {
+  local bun_path bun_bin
+
+  if [ -n "${BUN_INSTALL:-}" ] && [ -d "${BUN_INSTALL:-}" ]; then
+    printf '%s\n' "$BUN_INSTALL"
+    return 0
+  fi
+
+  if [ -r "$HOME/.bun/_bun" ]; then
+    printf '%s\n' "$HOME/.bun"
+    return 0
+  fi
+
+  bun_path="$(command -v bun 2>/dev/null || true)"
+  case "$bun_path" in
+    */.bun/bin/bun)
+      bun_bin="${bun_path%/bun}"
+      printf '%s\n' "${bun_bin%/bin}"
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+dotfiles_rustup_sysroot() {
+  local rustc_path cargo_home_root cargo_bin rustup_home
+  local sysroot
+
+  rustc_path="$(command -v rustc 2>/dev/null || true)"
+  if [ -z "$rustc_path" ]; then
+    return 1
+  fi
+
+  sysroot="$(rustc --print sysroot 2>/dev/null || true)"
+  if [ -n "$sysroot" ]; then
+    printf '%s\n' "$sysroot"
+    return 0
+  fi
+
+  cargo_bin="${rustc_path%/rustc}"
+  case "$cargo_bin" in
+    */.cargo/bin)
+      cargo_home_root="${cargo_bin%/.cargo/bin}"
+      rustup_home="${RUSTUP_HOME:-$cargo_home_root/.rustup}"
+      sysroot="$(CARGO_HOME="${CARGO_HOME:-$cargo_home_root/.cargo}" RUSTUP_HOME="$rustup_home" rustc --print sysroot 2>/dev/null || true)"
+      if [ -n "$sysroot" ]; then
+        printf '%s\n' "$sysroot"
+        return 0
+      fi
+      ;;
+  esac
+
+  return 1
+}
+
 dotfiles_init_brew() {
   local brew_bin
 

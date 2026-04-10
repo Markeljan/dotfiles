@@ -49,5 +49,7 @@ if status is-interactive
         else
             set -gx FZF_DEFAULT_COMMAND 'find . -path "*/.git" -prune -o -path "*/node_modules" -prune -o -print'
         end
+
+        fzf --fish | source
     end
 end

@@ -160,6 +160,7 @@ This repo stays intentionally small:
 - bash, zsh, and fish shell configs from one shared data model
 - minimal `starship` prompt
 - `fzf` preview configuration and `fzf-preview`
+- shell completions for common installed tools in bash, zsh, and fish
 - `tmux` baseline with SSH-only auto-attach to a persistent `main` session
 - SSH client config with optional 1Password agent wiring
 - append-safe `authorized_keys` generation from shared and local files
@@ -204,6 +205,7 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 
 - shared PATH entries for `~/.local/bin` and `~/.bun/bin`
 - optional `brew shellenv`
+- optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
 - optional 1Password SSH agent export via `~/.1password/agent.sock`
 - optional `zoxide` and `starship` initialization
 - one shared function: `mkcd`
@@ -256,6 +258,7 @@ Package definitions live in `.chezmoidata/packages.toml`.
 
 - macOS uses Homebrew
 - Debian and Ubuntu use APT
+- Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
 - `uv` installs through the official Astral installer
 - `bun` installs through the official Bun installer
 - `neovim` installs through the system package manager
