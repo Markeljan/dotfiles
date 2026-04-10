@@ -10,6 +10,9 @@ else
     {{- end }}
 end
 
+set -gx HOMEBREW_NO_INSTALL_CLEANUP 1
+set -gx HOMEBREW_NO_ENV_HINTS 1
+
 if command -q fnm
     fnm env --use-on-cd --shell fish | source
 end
