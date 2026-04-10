@@ -135,6 +135,20 @@ dotfiles_set_ssh_agent() {
   {{- end }}
 }
 
+dotfiles_set_safe_term() {
+  if [ "${TERM:-}" != "xterm-ghostty" ]; then
+    return
+  fi
+
+  if dotfiles_have infocmp && infocmp xterm-ghostty >/dev/null 2>&1; then
+    return
+  fi
+
+  TERM="xterm-256color"
+  export TERM
+  unset TERMINFO
+}
+
 mkcd() {
   if [ "$#" -eq 0 ]; then
     printf 'mkcd: missing directory\n' >&2
@@ -149,6 +163,7 @@ dotfiles_init_brew
 path_prepend "$HOME/{{ . }}"
 {{- end }}
 dotfiles_set_ssh_agent
+dotfiles_set_safe_term
 
 {{- range .shell.aliases }}
 alias {{ .name }}='{{ .expansion }}'

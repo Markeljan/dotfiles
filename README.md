@@ -250,6 +250,8 @@ On machines with no existing `~/.ssh/config`, the post-apply hook creates a mini
 
 Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten. If `~/.ssh/authorized_keys.shared` does not exist yet, the post-apply hook creates it as an empty local file.
 
+When using Ghostty over SSH, the macOS Ghostty config enables `ssh-terminfo`, `ssh-env`, and `sudo` shell integration so Ghostty can install `xterm-ghostty` terminfo remotely, fall back to `xterm-256color` when it cannot, and preserve the terminfo environment through `sudo`. The shared bash, zsh, and fish startup files also downgrade `TERM` to `xterm-256color` if `xterm-ghostty` is not resolvable on the current host.
+
 ## Packages
 
 Package definitions live in `.chezmoidata/packages.toml`.

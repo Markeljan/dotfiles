@@ -8,3 +8,10 @@ for socket in {{- range .shell.ssh_agent_sockets }} "$HOME/{{ . }}"{{- end }}
         break
     end
 end
+
+if test "$TERM" = "xterm-ghostty"
+    if not command -q infocmp; or not infocmp xterm-ghostty >/dev/null 2>&1
+        set -gx TERM xterm-256color
+        set -e TERMINFO
+    end
+end
