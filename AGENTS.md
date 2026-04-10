@@ -56,12 +56,15 @@ After changes, run:
 
 ```bash
 tmp_home="$(mktemp -d)"
+mkdir -p "$tmp_home/.config/nvim"
+printf 'set number\n' >"$tmp_home/.config/nvim/init.vim"
 HOME="$tmp_home" DOTFILES_SKIP_PACKAGES=1 DOTFILES_SKIP_LOGIN_SHELL=1 chezmoi init --apply --force --source "$PWD" --destination "$tmp_home"
 bash -n "$tmp_home/.bashrc"
 zsh -n "$tmp_home/.zshrc"
 for file in "$tmp_home/.config/fish/config.fish" "$tmp_home"/.config/fish/conf.d/*.fish "$tmp_home"/.config/fish/functions/*.fish; do fish -n "$file"; done
-nvim --headless "+qa" || true
+HOME="$tmp_home" nvim --headless "+qa" || true
 test -f "$tmp_home/.ssh/authorized_keys"
+test ! -e "$tmp_home/.config/nvim/init.vim"
 test ! -e "$tmp_home/.tmux.conf"
 test ! -e "$tmp_home/CLAUDE.md"
 rm -rf "$tmp_home"

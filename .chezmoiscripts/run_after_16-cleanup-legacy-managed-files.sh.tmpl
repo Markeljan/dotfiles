@@ -72,3 +72,7 @@ bind r source-file ~/.tmux.conf \; display-message "tmux config reloaded"
 
 if-shell 'test -f ~/.tmux.local.conf' 'source-file ~/.tmux.local.conf'
 EOF
+
+if [ -f "$HOME/.config/nvim/init.lua" ] && [ -e "$HOME/.config/nvim/init.vim" ]; then
+  rm -f "$HOME/.config/nvim/init.vim"
+fi

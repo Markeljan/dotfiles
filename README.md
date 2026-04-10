@@ -203,6 +203,8 @@ to:
 
 If `~/.bashrc`, `~/.zshrc`, `~/.bash_profile`, `~/.zprofile`, or `~/.ssh/config` already exist, this repo preserves them. New machines get minimal create-only files, and existing machines get a small source/include hook when needed instead of a full replacement.
 
+If a stale `~/.config/nvim/init.vim` exists alongside the managed `init.lua`, the cleanup hook removes `init.vim` after apply so Neovim does not see conflicting startup configs.
+
 ## Shared shell baseline
 
 The shared shell model lives in `.chezmoidata/shell.toml`.
