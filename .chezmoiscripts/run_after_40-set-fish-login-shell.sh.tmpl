@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "${DOTFILES_SKIP_LOGIN_SHELL:-0}" = "1" ]; then
+  exit 0
+fi
+
+have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+warn() {
+  printf '[dotfiles shell] warning: %s\n' "$*" >&2
+}
+
+current_login_shell() {
+  if have dscl; then
+    dscl . -read "/Users/$USER" UserShell 2>/dev/null | awk '{print $2}'
+    return
+  fi
+
+  if have getent; then
+    getent passwd "$USER" | cut -d: -f7
+    return
+  fi
+
+  printf '%s\n' "${SHELL:-}"
+}
+
+add_shell_to_etc_shells() {
+  local fish_path="$1"
+
+  if [ ! -r /etc/shells ] || grep -qx "$fish_path" /etc/shells 2>/dev/null; then
+    return 0
+  fi
+
+  if [ "$(id -u)" -eq 0 ]; then
+    printf '%s\n' "$fish_path" >> /etc/shells
+    return 0
+  fi
+
+  if have sudo && sudo -n true 2>/dev/null; then
+    printf '%s\n' "$fish_path" | sudo tee -a /etc/shells >/dev/null
+    return 0
+  fi
+
+  return 1
+}
+
+dedupe_etc_shells() {
+  local temp_file
+
+  if [ ! -r /etc/shells ]; then
+    return 0
+  fi
+
+  temp_file="$(mktemp)"
+  awk '!seen[$0]++' /etc/shells > "$temp_file"
+
+  if cmp -s "$temp_file" /etc/shells; then
+    rm -f "$temp_file"
+    return 0
+  fi
+
+  if [ "$(id -u)" -eq 0 ]; then
+    cp "$temp_file" /etc/shells
+    rm -f "$temp_file"
+    return 0
+  fi
+
+  if have sudo && sudo -n true 2>/dev/null; then
+    sudo cp "$temp_file" /etc/shells
+  fi
+
+  rm -f "$temp_file"
+}
+
+print_manual_instructions() {
+  local fish_path="$1"
+
+  printf '[dotfiles shell] run these commands to make fish the login shell:\n' >&2
+  printf '  echo "%s" | sudo tee -a /etc/shells\n' "$fish_path" >&2
+  printf '  chsh -s "%s"\n' "$fish_path" >&2
+}
+
+main() {
+  local fish_path current_shell
+
+  fish_path="$(command -v fish || true)"
+  if [ -z "$fish_path" ]; then
+    exit 0
+  fi
+
+  dedupe_etc_shells
+  current_shell="$(current_login_shell)"
+  if [ "$current_shell" = "$fish_path" ]; then
+    exit 0
+  fi
+
+  if ! add_shell_to_etc_shells "$fish_path"; then
+    warn "could not add $fish_path to /etc/shells automatically"
+  fi
+
+  if ! have chsh; then
+    warn "chsh is not available"
+    print_manual_instructions "$fish_path"
+    exit 0
+  fi
+
+  if [ -t 0 ] && chsh -s "$fish_path"; then
+    exit 0
+  fi
+
+  warn "fish is installed but is not yet the login shell"
+  print_manual_instructions "$fish_path"
+}
+
+main "$@"

@@ -4,36 +4,132 @@ Minimal [chezmoi](https://www.chezmoi.io/) dotfiles for macOS, Debian, and Ubunt
 
 ## Quick Start
 
-This repo is the chezmoi source directory.
+Use chezmoi directly.
 
-Install on a new machine:
+If chezmoi is not installed yet:
 
 ```bash
-git clone <repo-url> ~/dotfiles
-cd ~/dotfiles
-./install.sh
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan
 ```
 
-Apply repo changes after editing or pulling:
+If chezmoi is already installed:
 
 ```bash
-cd ~/dotfiles
-chezmoi diff
-chezmoi apply
+chezmoi init --apply Markeljan
 ```
 
-Update from Git and re-apply:
+Because this repo is named `dotfiles`, `chezmoi init Markeljan` uses chezmoi's default GitHub URL guessing and resolves to the `Markeljan/dotfiles` repo.
+
+If `fish` does not become the login shell automatically, run:
 
 ```bash
-cd ~/dotfiles
-git pull --ff-only
-chezmoi apply
+echo "$(command -v fish)" | sudo tee -a /etc/shells
+chsh -s "$(command -v fish)"
 ```
 
 Skip package installation when testing:
 
 ```bash
-DOTFILES_SKIP_PACKAGES=1 ./install.sh
+DOTFILES_SKIP_PACKAGES=1 chezmoi init --apply Markeljan
+```
+
+Skip the login-shell change when testing:
+
+```bash
+DOTFILES_SKIP_LOGIN_SHELL=1 chezmoi apply
+```
+
+## New VPS Example
+
+On a fresh Ubuntu or Debian VPS:
+
+```bash
+ssh root@your-server
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan
+```
+
+What happens:
+
+- chezmoi clones the repo into its source directory
+- the package script installs the baseline packages with APT
+- your shell, tmux, SSH, Neovim, and prompt config are applied
+- dotfiles tries to set `fish` as the login shell
+
+If the shell switch cannot happen automatically, run the two manual commands shown above.
+
+## Daily Use
+
+Pull new repo changes and apply them:
+
+```bash
+chezmoi update
+```
+
+Preview local changes before applying:
+
+```bash
+chezmoi diff
+```
+
+Apply the current source state again:
+
+```bash
+chezmoi apply
+```
+
+Show non-script drift:
+
+```bash
+chezmoi status --exclude=scripts
+```
+
+## Updating This Repo
+
+If you want to change the shared dotfiles source itself, work in the chezmoi source directory:
+
+```bash
+chezmoi cd
+```
+
+For example, to add a shared alias:
+
+```bash
+chezmoi cd
+$EDITOR .chezmoidata/shell.toml
+chezmoi diff
+chezmoi apply
+git add .chezmoidata/shell.toml
+git commit -m "feat: add alias"
+git push
+```
+
+Shared aliases live in `.chezmoidata/shell.toml`, then render into bash, zsh, and fish.
+
+If you prefer maintaining the repo from an explicit checkout like `~/Projects/dotfiles`, point chezmoi at that checkout once:
+
+```bash
+git clone https://github.com/Markeljan/dotfiles.git ~/Projects/dotfiles
+cd ~/Projects/dotfiles
+chezmoi init --apply --source "$PWD"
+```
+
+After that, plain `chezmoi apply`, `chezmoi update`, and `chezmoi doctor` use that checkout as the source directory.
+
+## Syncing An Existing Local Machine
+
+If this machine is already set up and chezmoi is already configured, the normal sync command is:
+
+```bash
+chezmoi update
+```
+
+That pulls the latest Git changes in the configured source directory and reapplies them to your home directory.
+
+If you are actively editing the source repo on the same machine and do not want chezmoi to pull first, use:
+
+```bash
+chezmoi diff
+chezmoi apply
 ```
 
 ## How To Change Things
@@ -41,8 +137,8 @@ DOTFILES_SKIP_PACKAGES=1 ./install.sh
 Edit the files in this repo, then apply them:
 
 ```bash
-cd ~/dotfiles
-$EDITOR dot_zshrc.tmpl
+chezmoi cd
+$EDITOR .chezmoidata/shell.toml
 chezmoi diff
 chezmoi apply
 ```
@@ -53,15 +149,8 @@ Useful chezmoi commands:
 - `chezmoi apply` writes the managed files to your home directory.
 - `chezmoi status --exclude=scripts` shows which managed files differ.
 - `chezmoi managed` lists the files managed by chezmoi.
-
-`install.sh` does three things:
-
-1. installs `chezmoi` if it is missing
-2. runs `chezmoi init --apply --force --source="$PWD"`
-3. creates `~/.config/chezmoi/chezmoi.toml` pointing `sourceDir` at this repo
-4. tries to set `fish` as the login shell
-
-If the login shell update cannot complete automatically, the script prints the exact manual commands to run.
+- `chezmoi cd` opens a shell in the source directory.
+- `chezmoi update` pulls and reapplies repo changes.
 
 ## What This Repo Manages
 
@@ -175,6 +264,8 @@ On macOS, the package bootstrap no longer installs Homebrew `bash` or `zsh`. The
 
 Set `DOTFILES_SKIP_PACKAGES=1` when you want to test or apply the repo without running package installs.
 
+Set `DOTFILES_SKIP_LOGIN_SHELL=1` when you want to skip the login-shell update script.
+
 ## Local overrides
 
 Keep machine-specific changes outside the repo:
@@ -187,15 +278,4 @@ Keep machine-specific changes outside the repo:
 
 ## Daily usage
 
-After the first install:
-
-```bash
-chezmoi apply
-```
-
-If this repo is your chezmoi source directory and you pull new changes into it:
-
-```bash
-git pull --ff-only
-chezmoi apply
-```
+After the first install, `chezmoi update` is the normal sync command.
