@@ -29,6 +29,7 @@ Maintainers may also point chezmoi at an explicit local checkout with `chezmoi i
 - `~/.config/starship.toml`
 - `~/.config/nvim`
 - `~/.ssh/config.shared`
+- `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config` on macOS only
@@ -45,7 +46,7 @@ On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked
 - Do not store secrets in the repo.
 - Keep machine-specific aliases, SSH hosts, and extra keys in local override files.
 - Do not seed host aliases or existing `authorized_keys` entries from the current machine into the repo.
-- Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file, and create `~/.ssh/authorized_keys.shared` locally when it is missing.
+- Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file, keep repo-wide keys in `~/.ssh/authorized_keys.shared`, and keep machine-specific additions in `~/.ssh/authorized_keys.local`.
 - Preserve existing top-level shell rc files and SSH config when a shared-file alternative is available.
 - Keep `fish` as the intended login shell and do not auto-attach or repo-manage `tmux`.
 - Do not reintroduce a separate installer wrapper when chezmoi can express the workflow directly.
@@ -63,6 +64,7 @@ bash -n "$tmp_home/.bashrc"
 zsh -n "$tmp_home/.zshrc"
 for file in "$tmp_home/.config/fish/config.fish" "$tmp_home"/.config/fish/conf.d/*.fish "$tmp_home"/.config/fish/functions/*.fish; do fish -n "$file"; done
 HOME="$tmp_home" nvim --headless "+qa" || true
+test -f "$tmp_home/.ssh/authorized_keys.shared"
 test -f "$tmp_home/.ssh/authorized_keys"
 test ! -e "$tmp_home/.config/nvim/init.vim"
 test ! -e "$tmp_home/.tmux.conf"

@@ -189,6 +189,7 @@ This repo stays intentionally small:
 - `~/.config/starship.toml`
 - `~/.config/nvim`
 - `~/.ssh/config.shared`
+- `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config`
@@ -247,10 +248,10 @@ On machines with no existing `~/.ssh/config`, the post-apply hook creates a mini
 `authorized_keys` is generated on every `chezmoi apply` from:
 
 - the existing `~/.ssh/authorized_keys` file
-- shared base: `~/.ssh/authorized_keys.shared` if present
+- shared base: repo-managed `~/.ssh/authorized_keys.shared`
 - optional local append file: `~/.ssh/authorized_keys.local`
 
-Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten. If `~/.ssh/authorized_keys.shared` does not exist yet, the post-apply hook creates it as an empty local file.
+Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten.
 
 When using Ghostty over SSH, the macOS Ghostty config keeps only `sudo` shell integration enabled. The shared bash, zsh, and fish startup files force `TERM=xterm-256color` for SSH sessions and also downgrade to `xterm-256color` on local hosts where `xterm-ghostty` is not resolvable.
 

@@ -6,7 +6,6 @@ keybind = cmd+shift+n=new_window
 # cmd+s write file vim
 keybind = super+s=text:\x1b:w\n
 keybind = super+s=text:\x1b:x\n
-
 # SSH
 shell-integration = detect
 shell-integration-features = sudo,no-cursor
@@ -27,6 +26,10 @@ macos-option-as-alt = true
 macos-non-native-fullscreen = true
 macos-titlebar-proxy-icon = hidden
 
+window-padding-balance = true
+window-padding-x = 4
+window-padding-y = 2
+window-padding-color = extend-always
 window-new-tab-position = end
 window-save-state = never
 quit-after-last-window-closed = false
