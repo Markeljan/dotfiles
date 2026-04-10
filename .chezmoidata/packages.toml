@@ -13,10 +13,13 @@ brew = [
 
 [packages.debian]
 apt = [
+  "build-essential",
   "bash-completion",
+  "file",
   "zsh",
   "fish",
   "git",
+  "procps",
   "curl",
   "fd-find",
   "fzf",
@@ -27,10 +30,13 @@ apt = [
 
 [packages.ubuntu]
 apt = [
+  "build-essential",
   "bash-completion",
+  "file",
   "zsh",
   "fish",
   "git",
+  "procps",
   "curl",
   "fd-find",
   "fzf",

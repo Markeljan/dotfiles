@@ -8,7 +8,9 @@ This repo is a minimal chezmoi-managed dotfiles baseline for macOS, Debian, and 
 2. Use `chezmoi update` for normal sync.
 3. Use `chezmoi apply` when you want to re-render the current source state without pulling Git changes.
 
-If chezmoi is not installed, use `sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan`.
+On Ubuntu, prefer `sudo snap install chezmoi --classic` and then `chezmoi init --apply Markeljan`.
+
+If chezmoi is not installed and `snap` is unavailable, use `sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan`.
 
 Because the repo is named `dotfiles`, `chezmoi init Markeljan` uses chezmoi's default GitHub URL guessing and resolves to `Markeljan/dotfiles`.
 
@@ -21,13 +23,11 @@ Maintainers may also point chezmoi at an explicit local checkout with `chezmoi i
 - `~/.config/sh/zprofile`
 - `~/.config/sh/zshrc`
 - `~/.config/sh/shared.sh`
-- `~/.config/sh/ssh-tmux.sh`
 - `~/.config/fish/config.fish`
 - `~/.config/fish/conf.d/*.fish`
 - `~/.config/fish/functions/mkcd.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
-- `~/.tmux.conf`
 - `~/.ssh/config.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
@@ -47,7 +47,7 @@ On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked
 - Do not seed host aliases or existing `authorized_keys` entries from the current machine into the repo.
 - Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file, and create `~/.ssh/authorized_keys.shared` locally when it is missing.
 - Preserve existing top-level shell rc files and SSH config when a shared-file alternative is available.
-- Keep `fish` as the intended login shell and shared SSH `tmux` behavior limited to interactive SSH sessions.
+- Keep `fish` as the intended login shell and do not auto-attach or repo-manage `tmux`.
 - Do not reintroduce a separate installer wrapper when chezmoi can express the workflow directly.
 
 ## Verification
@@ -62,6 +62,8 @@ zsh -n "$tmp_home/.zshrc"
 for file in "$tmp_home/.config/fish/config.fish" "$tmp_home"/.config/fish/conf.d/*.fish "$tmp_home"/.config/fish/functions/*.fish; do fish -n "$file"; done
 nvim --headless "+qa" || true
 test -f "$tmp_home/.ssh/authorized_keys"
+test ! -e "$tmp_home/.tmux.conf"
+test ! -e "$tmp_home/CLAUDE.md"
 rm -rf "$tmp_home"
 git diff --stat
 ```
@@ -72,6 +74,5 @@ git diff --stat
 - `~/.config/fish/conf.d/99-local.fish`
 - `~/.ssh/config.local`
 - `~/.ssh/authorized_keys.local`
-- `~/.tmux.local.conf`
 
 If you add new managed files, update both this document and `README.md`.

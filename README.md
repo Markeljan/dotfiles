@@ -6,7 +6,14 @@ Minimal [chezmoi](https://www.chezmoi.io/) dotfiles for macOS, Debian, and Ubunt
 
 Use chezmoi directly.
 
-If chezmoi is not installed yet:
+If chezmoi is not installed yet on Ubuntu, prefer:
+
+```bash
+sudo snap install chezmoi --classic
+chezmoi init --apply Markeljan
+```
+
+If chezmoi is not installed yet and `snap` is unavailable:
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan
@@ -41,18 +48,19 @@ DOTFILES_SKIP_LOGIN_SHELL=1 chezmoi apply
 
 ## New VPS Example
 
-On a fresh Ubuntu or Debian VPS:
+On a fresh Ubuntu or Debian VPS, use a non-root user:
 
 ```bash
-ssh root@your-server
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan
+ssh your-user@your-server
+sudo snap install chezmoi --classic
+chezmoi init --apply Markeljan
 ```
 
 What happens:
 
 - chezmoi clones the repo into its source directory
-- the package script installs the baseline packages with APT
-- your shell, tmux, SSH, Neovim, and prompt config are applied
+- the package script installs the baseline packages with APT, Homebrew, `fnm`, Node.js LTS, `uv`, and `bun`
+- your shell, SSH, Neovim, and prompt config are applied
 - dotfiles tries to set `fish` as the login shell
 
 If the shell switch cannot happen automatically, run the two manual commands shown above.
@@ -161,11 +169,11 @@ This repo stays intentionally small:
 - minimal `starship` prompt
 - `fzf` preview configuration and `fzf-preview`
 - shell completions for common installed tools in bash, zsh, and fish
-- `tmux` baseline with SSH-only auto-attach to a persistent `main` session
+- `tmux` installed without repo-managed auto-attach or custom config
 - SSH client config with optional 1Password agent wiring
 - append-safe `authorized_keys` generation from shared and local files
 - minimal Neovim with a left file tree and editor pane
-- package bootstrap with Homebrew, APT, `uv`, and `bun`
+- package bootstrap with APT, Homebrew, `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
 
 ## Managed files
@@ -175,13 +183,11 @@ This repo stays intentionally small:
 - `~/.config/sh/zprofile`
 - `~/.config/sh/zshrc`
 - `~/.config/sh/shared.sh`
-- `~/.config/sh/ssh-tmux.sh`
 - `~/.config/fish/config.fish`
 - `~/.config/fish/conf.d/*.fish`
 - `~/.config/fish/functions/mkcd.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
-- `~/.tmux.conf`
 - `~/.ssh/config.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
@@ -203,8 +209,9 @@ The shared shell model lives in `.chezmoidata/shell.toml`.
 
 v1 keeps the shell layer intentionally plain, with a few restored workflow helpers:
 
-- shared PATH entries for `~/.local/bin` and `~/.bun/bin`
+- shared PATH entries for `~/bin`, `~/.local/bin`, and `~/.bun/bin`
 - optional `brew shellenv`
+- optional `fnm` initialization with Node.js LTS via `fnm`
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
 - optional 1Password SSH agent export via `~/.1password/agent.sock`
 - optional `zoxide` and `starship` initialization
@@ -218,7 +225,7 @@ fish uses `abbr`. bash and zsh use aliases.
 
 `fzf` is configured with a right-hand 50% preview split and `~/.local/bin/fzf-preview`.
 
-## SSH and tmux behavior
+## SSH behavior
 
 `~/.ssh/config.shared` is repo-managed and contains:
 
@@ -243,22 +250,16 @@ On machines with no existing `~/.ssh/config`, the post-apply hook creates a mini
 
 Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten. If `~/.ssh/authorized_keys.shared` does not exist yet, the post-apply hook creates it as an empty local file.
 
-Interactive SSH logins auto-attach to a shared `tmux` session named `main` when:
-
-- the shell is interactive
-- `SSH_CONNECTION` is set
-- `TMUX` is not already set
-- `SSH_ORIGINAL_COMMAND` is not set
-
-Disconnecting the SSH client detaches from `tmux`; it does not kill the session.
-
 ## Packages
 
 Package definitions live in `.chezmoidata/packages.toml`.
 
 - macOS uses Homebrew
-- Debian and Ubuntu use APT
+- Debian and Ubuntu use APT for baseline packages and Homebrew for `fnm`
+- Debian and Ubuntu install the Homebrew prerequisites from the official Homebrew docs
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
+- `fnm` installs through Homebrew
+- Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer
 - `bun` installs through the official Bun installer
 - `neovim` installs through the system package manager
@@ -277,7 +278,6 @@ Keep machine-specific changes outside the repo:
 - `~/.config/fish/conf.d/99-local.fish`
 - `~/.ssh/config.local`
 - `~/.ssh/authorized_keys.local`
-- `~/.tmux.local.conf`
 
 ## Daily usage
 

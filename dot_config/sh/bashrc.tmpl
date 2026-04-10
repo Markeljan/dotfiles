@@ -83,12 +83,6 @@ dotfiles_init_bash_completion() {
       /usr/share/bash-completion/completions/gh
   fi
 
-  if command -v tmux >/dev/null 2>&1 && declare -F _get_comp_words_by_ref >/dev/null 2>&1; then
-    dotfiles_source_bash_completion_file \
-      "$dotfiles_bash_completion_dir/tmux" \
-      /usr/share/bash-completion/completions/tmux
-  fi
-
   if command -v bat >/dev/null 2>&1 && declare -F _get_comp_words_by_ref >/dev/null 2>&1 && declare -F _split_longopt >/dev/null 2>&1; then
     dotfiles_source_bash_completion_file \
       "$dotfiles_bash_completion_dir/bat" \
@@ -113,6 +107,10 @@ dotfiles_init_bash_completion() {
   unset dotfiles_brew_root dotfiles_bash_completion_dir dotfiles_share_completion_dir dotfiles_cargo_completion
 }
 
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell bash)"
+fi
+
 dotfiles_init_bash_completion
 unset -f dotfiles_source_bash_completion_file dotfiles_init_bash_completion
 
@@ -126,8 +124,4 @@ fi
 
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init bash)"
-fi
-
-if [ -f "$HOME/.config/sh/ssh-tmux.sh" ]; then
-  . "$HOME/.config/sh/ssh-tmux.sh"
 fi

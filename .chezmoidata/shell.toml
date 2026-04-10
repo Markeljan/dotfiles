@@ -1,5 +1,6 @@
 [shell]
 path_entries = [
+  "bin",
   ".local/bin",
   ".bun/bin",
 ]
@@ -76,6 +77,3 @@ expansion = "claude --dangerously-skip-permissions"
 [[shell.aliases]]
 name = "dcodex"
 expansion = "codex --dangerously-bypass-approvals-and-sandbox"
-
-[shell.tmux]
-ssh_session_name = "main"

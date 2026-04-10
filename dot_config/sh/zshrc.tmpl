@@ -37,6 +37,10 @@ if [ -f "$HOME/.config/sh/fzf.sh" ]; then
   . "$HOME/.config/sh/fzf.sh"
 fi
 
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
+
 if command -v pnpm >/dev/null 2>&1; then
   eval "$(SHELL=zsh pnpm completion zsh 2>/dev/null)"
 fi
@@ -59,10 +63,6 @@ fi
 
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
-fi
-
-if [ -f "$HOME/.config/sh/ssh-tmux.sh" ]; then
-  . "$HOME/.config/sh/ssh-tmux.sh"
 fi
 
 unset dotfiles_brew_root dotfiles_bun_completion_root

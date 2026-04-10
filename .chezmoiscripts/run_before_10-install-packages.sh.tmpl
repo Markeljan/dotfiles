@@ -36,7 +36,12 @@ download() {
 }
 
 ensure_local_bin() {
-  mkdir -p "$HOME/.local/bin"
+  mkdir -p "$HOME/bin" "$HOME/.local/bin"
+
+  case ":$PATH:" in
+    *":$HOME/bin:"*) ;;
+    *) export PATH="$HOME/bin:$PATH" ;;
+  esac
 
   case ":$PATH:" in
     *":$HOME/.local/bin:"*) ;;
@@ -70,8 +75,24 @@ install_homebrew() {
     return
   fi
 
+  if [ "$(uname -s)" = "Linux" ] && [ "$(id -u)" -eq 0 ]; then
+    warn "Homebrew on Linux requires a non-root user"
+    return 1
+  fi
+
   log "installing Homebrew"
   NONINTERACTIVE=1 CI=1 /bin/bash -c "$(download "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh")"
+}
+
+eval_brew_shellenv() {
+  local brew_bin
+
+  brew_bin="$(brew_path 2>/dev/null || true)"
+  if [ -z "$brew_bin" ]; then
+    return 1
+  fi
+
+  eval "$("$brew_bin" shellenv)"
 }
 
 install_brew_packages() {
@@ -92,6 +113,30 @@ install_brew_packages() {
     log "installing Homebrew packages: ${missing[*]}"
     brew install "${missing[@]}"
   fi
+}
+
+install_fnm() {
+  install_homebrew
+  eval_brew_shellenv
+
+  if have fnm; then
+    return
+  fi
+
+  log "installing fnm"
+  brew install fnm
+}
+
+install_node_lts() {
+  if ! have fnm; then
+    warn "fnm is required to install Node.js LTS"
+    return 1
+  fi
+
+  log "ensuring latest Node.js LTS via fnm"
+  eval "$(fnm env --shell bash)"
+  fnm install --lts --use
+  fnm default "$(fnm current)"
 }
 
 detect_linux_id() {
@@ -268,6 +313,8 @@ main() {
 
   install_uv
   install_bun
+  install_fnm
+  install_node_lts
   ensure_fd_symlink
   install_uv_tools
   install_bun_packages
