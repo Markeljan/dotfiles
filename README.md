@@ -58,7 +58,8 @@ Useful chezmoi commands:
 
 1. installs `chezmoi` if it is missing
 2. runs `chezmoi init --apply --force --source="$PWD"`
-3. tries to set `fish` as the login shell
+3. creates `~/.config/chezmoi/chezmoi.toml` pointing `sourceDir` at this repo
+4. tries to set `fish` as the login shell
 
 If the login shell update cannot complete automatically, the script prints the exact manual commands to run.
 

@@ -8,6 +8,8 @@ This repo is a minimal chezmoi-managed dotfiles baseline for macOS, Debian, and 
 2. Run `./install.sh`.
 3. Use `chezmoi apply` for subsequent updates.
 
+`install.sh` bootstraps chezmoi and writes `~/.config/chezmoi/chezmoi.toml` so plain `chezmoi apply`, `chezmoi status`, and `chezmoi doctor` use this repo as the source directory.
+
 ## Managed targets
 
 - `~/.config/sh/bash_profile`
