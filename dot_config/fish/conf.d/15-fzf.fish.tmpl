@@ -50,6 +50,35 @@ if status is-interactive
             set -gx FZF_DEFAULT_COMMAND 'find . -path "*/.git" -prune -o -path "*/node_modules" -prune -o -print'
         end
 
-        fzf --fish | source
+        if string match -rq -- '--fish' $fzf_help
+            fzf --fish | source
+        else
+            set -l fzf_completion_loaded 0
+            set -l fzf_key_bindings_loaded 0
+
+            for fzf_script in \
+                "$HOME/.fzf/shell/completion.fish" \
+                /opt/homebrew/opt/fzf/shell/completion.fish \
+                /usr/local/opt/fzf/shell/completion.fish \
+                /usr/share/doc/fzf/examples/completion.fish \
+                /usr/share/fish/vendor_completions.d/fzf.fish
+                if test "$fzf_completion_loaded" -eq 0 -a -r "$fzf_script"
+                    source "$fzf_script"
+                    set fzf_completion_loaded 1
+                end
+            end
+
+            for fzf_script in \
+                "$HOME/.fzf/shell/key-bindings.fish" \
+                /opt/homebrew/opt/fzf/shell/key-bindings.fish \
+                /usr/local/opt/fzf/shell/key-bindings.fish \
+                /usr/share/doc/fzf/examples/key-bindings.fish \
+                /usr/share/fish/vendor_functions.d/fzf_key_bindings.fish
+                if test "$fzf_key_bindings_loaded" -eq 0 -a -r "$fzf_script"
+                    source "$fzf_script"
+                    set fzf_key_bindings_loaded 1
+                end
+            end
+        end
     end
 end
