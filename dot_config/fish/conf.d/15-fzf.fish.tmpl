@@ -17,7 +17,7 @@ if status is-interactive
         end
 
         if string match -rq -- '--scrollbar' $fzf_help
-            set fzf_layout "$fzf_layout --scrollbar=|"
+            set fzf_layout "$fzf_layout --scrollbar=\"|\""
         end
 
         if string match -rq -- '--info=' $fzf_help
