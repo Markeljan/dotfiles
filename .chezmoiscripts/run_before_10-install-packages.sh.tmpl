@@ -108,7 +108,8 @@ eval_brew_shellenv() {
 
 install_brew_packages() {
   local brew_bin
-  local -a missing=()
+  local -a formula_missing=()
+  local -a cask_missing=()
 
   install_homebrew
   brew_bin="$(brew_path)"
@@ -116,13 +117,24 @@ install_brew_packages() {
 
   {{- range .packages.darwin.brew }}
   if ! brew list --versions "{{ . }}" >/dev/null 2>&1; then
-    missing+=("{{ . }}")
+    formula_missing+=("{{ . }}")
   fi
   {{- end }}
 
-  if [ "${#missing[@]}" -gt 0 ]; then
-    log "installing Homebrew packages: ${missing[*]}"
-    brew install "${missing[@]}"
+  {{- range .packages.darwin.cask }}
+  if ! brew list --cask --versions "{{ . }}" >/dev/null 2>&1; then
+    cask_missing+=("{{ . }}")
+  fi
+  {{- end }}
+
+  if [ "${#formula_missing[@]}" -gt 0 ]; then
+    log "installing Homebrew packages: ${formula_missing[*]}"
+    brew install "${formula_missing[@]}"
+  fi
+
+  if [ "${#cask_missing[@]}" -gt 0 ]; then
+    log "installing Homebrew casks: ${cask_missing[*]}"
+    brew install --cask "${cask_missing[@]}"
   fi
 }
 

@@ -4,11 +4,16 @@ brew = [
   "fish",
   "fd",
   "fzf",
+  "gh",
   "neovim",
   "ripgrep",
   "starship",
-  "zoxide",
   "tmux",
+  "zoxide",
+]
+cask = [
+  "cursor",
+  "visual-studio-code",
 ]
 
 [packages.debian]

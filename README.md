@@ -59,7 +59,7 @@ chezmoi init --apply Markeljan
 What happens:
 
 - chezmoi clones the repo into its source directory
-- the package script installs the baseline packages with APT, Homebrew, `fnm`, Node.js LTS, `uv`, and `bun`
+- the package script installs the baseline packages with APT, Homebrew formulae and macOS casks, `fnm`, Node.js LTS, `uv`, and `bun`
 - your shell, SSH, Neovim, and prompt config are applied
 - dotfiles tries to set `fish` as the login shell
 
@@ -173,7 +173,7 @@ This repo stays intentionally small:
 - SSH client config with optional 1Password agent wiring
 - append-safe `authorized_keys` generation from shared and local files
 - minimal Neovim with a left file tree and editor pane
-- package bootstrap with APT, Homebrew, `fnm`, Node.js LTS, `uv`, and `bun`
+- package bootstrap with APT, Homebrew formulae and macOS casks, `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
 
 ## Managed files
@@ -259,10 +259,11 @@ When using Ghostty over SSH, the macOS Ghostty config keeps only `sudo` shell in
 
 Package definitions live in `.chezmoidata/packages.toml`.
 
-- macOS uses Homebrew
+- macOS uses Homebrew formulae and casks
 - Debian and Ubuntu use APT for baseline packages and Homebrew for `fnm`
 - Debian and Ubuntu install the Homebrew prerequisites from the official Homebrew docs
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
+- macOS also installs the `gh` CLI plus the `cursor` and `visual-studio-code` app casks, which provide the `cursor` and `code` launcher commands
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
