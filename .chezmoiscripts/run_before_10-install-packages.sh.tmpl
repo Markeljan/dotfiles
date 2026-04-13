@@ -150,16 +150,41 @@ install_fnm() {
   brew install fnm
 }
 
+fnm_has_installed_lts() {
+  fnm list 2>/dev/null | grep -Fq 'lts-latest'
+}
+
 install_node_lts() {
   if ! have fnm; then
     warn "fnm is required to install Node.js LTS"
     return 1
   fi
 
-  log "ensuring latest Node.js LTS via fnm"
   eval "$(fnm env --shell bash)"
+
+  if fnm_has_installed_lts; then
+    local current
+    local default_version
+
+    if fnm use --silent-if-unchanged lts-latest >/dev/null 2>&1; then
+      current="$(fnm current 2>/dev/null || true)"
+      default_version="$(fnm default 2>/dev/null || true)"
+
+      if [ -n "$current" ] && [ "$current" != "system" ]; then
+        if [ "$default_version" != "$current" ]; then
+          fnm default "$current" >/dev/null 2>&1
+        fi
+
+        return 0
+      fi
+    fi
+
+    warn "installed Node.js LTS could not be activated; reinstalling via fnm"
+  fi
+
+  log "installing latest Node.js LTS via fnm"
   fnm install --lts --use
-  fnm default "$(fnm current)"
+  fnm default "$(fnm current)" >/dev/null 2>&1
 }
 
 detect_linux_id() {
