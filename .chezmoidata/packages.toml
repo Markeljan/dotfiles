@@ -11,10 +11,7 @@ brew = [
   "tmux",
   "zoxide",
 ]
-cask = [
-  "cursor",
-  "visual-studio-code",
-]
+cask = []
 
 [packages.debian]
 apt = [

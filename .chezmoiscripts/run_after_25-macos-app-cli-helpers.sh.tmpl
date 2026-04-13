@@ -1,0 +1,86 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() {
+  printf '[dotfiles app-cli] %s\n' "$*"
+}
+
+warn() {
+  printf '[dotfiles app-cli] warning: %s\n' "$*" >&2
+}
+
+contains_value() {
+  local needle="$1"
+  shift
+  local value
+
+  for value in "$@"; do
+    if [ "$value" = "$needle" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+sync_helper() {
+  local link_name="$1"
+  local app_name="$2"
+  local relative_target="$3"
+  local link_path="$HOME/.local/bin/$link_name"
+  local active_target=""
+  local current_target=""
+  local app_root=""
+  local candidate_targets=()
+
+  for app_root in "/Applications/$app_name.app" "$HOME/Applications/$app_name.app"; do
+    candidate_targets+=("$app_root/$relative_target")
+    if [ -z "$active_target" ] && [ -x "$app_root/$relative_target" ]; then
+      active_target="$app_root/$relative_target"
+    fi
+  done
+
+  if [ -n "$active_target" ]; then
+    if [ -L "$link_path" ]; then
+      current_target="$(readlink "$link_path")"
+      if [ "$current_target" = "$active_target" ]; then
+        return 0
+      fi
+
+      if contains_value "$current_target" "${candidate_targets[@]}"; then
+        rm -f "$link_path"
+      else
+        warn "leaving existing $link_path symlink in place"
+        return 0
+      fi
+    elif [ -e "$link_path" ]; then
+      warn "leaving existing $link_path file in place"
+      return 0
+    fi
+
+    ln -s "$active_target" "$link_path"
+    log "linked $link_name from $app_name.app"
+    return 0
+  fi
+
+  if [ -L "$link_path" ]; then
+    current_target="$(readlink "$link_path")"
+    if contains_value "$current_target" "${candidate_targets[@]}"; then
+      rm -f "$link_path"
+      log "removed stale $link_name helper"
+    fi
+  fi
+}
+
+main() {
+  mkdir -p "$HOME/.local/bin"
+
+  sync_helper "cursor" "Cursor" "Contents/Resources/app/bin/cursor"
+  sync_helper "cursor-tunnel" "Cursor" "Contents/Resources/app/bin/cursor-tunnel"
+  sync_helper "code" "Visual Studio Code" "Contents/Resources/app/bin/code"
+  sync_helper "github" "GitHub Desktop" "Contents/Resources/app/static/github.sh"
+}
+
+main "$@"
+{{ end -}}
