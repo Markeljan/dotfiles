@@ -31,7 +31,7 @@ If `fish` does not become the login shell automatically, run:
 
 ```bash
 echo "$(command -v fish)" | sudo tee -a /etc/shells
-sudo chsh -s "$(command -v fish)" "$USER"
+chsh -s "$(command -v fish)"
 ```
 
 Skip package installation when testing:
@@ -64,7 +64,7 @@ What happens:
 - your shell, SSH, Neovim, and prompt config are applied
 - dotfiles tries to set `fish` as the login shell
 
-If the shell switch cannot happen automatically, run the two manual commands shown above. Fresh Ubuntu cloud users often have passwordless `sudo` but no local account password, so `sudo chsh` is the reliable manual fix there.
+If the shell switch cannot happen automatically, run the two manual commands shown above.
 
 ## Daily Use
 
