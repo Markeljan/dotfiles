@@ -184,7 +184,6 @@ This repo stays intentionally small:
 - `~/.config/sh/zprofile`
 - `~/.config/sh/zshrc`
 - `~/.config/sh/shared.sh`
-- `~/.config/fish/config.fish`
 - `~/.config/fish/conf.d/*.fish`
 - `~/.config/fish/functions/mkcd.fish`
 - `~/.config/starship.toml`
@@ -211,6 +210,8 @@ to:
 - `~/.config/ghostty/config`
 
 If `~/.bashrc`, `~/.zshrc`, `~/.bash_profile`, `~/.zprofile`, or `~/.ssh/config` already exist, this repo preserves them. New machines get minimal create-only files, and existing machines get a small source/include hook when needed instead of a full replacement.
+
+`~/.config/fish/config.fish` is also create-only. Shared fish behavior lives in repo-managed `~/.config/fish/conf.d/*.fish`, while machine-specific edits and third-party tool additions can live in `~/.config/fish/config.fish` or `~/.config/fish/conf.d/99-local.fish` without fighting `chezmoi apply`.
 
 If a stale `~/.config/nvim/init.vim` exists alongside the managed `init.lua`, the cleanup hook removes `init.vim` after apply so Neovim does not see conflicting startup configs.
 
@@ -291,6 +292,7 @@ Set `DOTFILES_SKIP_LOGIN_SHELL=1` when you want to skip the login-shell update s
 Keep machine-specific changes outside the repo:
 
 - `~/.config/sh/local.sh`
+- `~/.config/fish/config.fish`
 - `~/.config/fish/conf.d/99-local.fish`
 - `~/.ssh/config.local`
 - `~/.ssh/authorized_keys.local`
