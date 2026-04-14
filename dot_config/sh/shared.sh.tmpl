@@ -165,6 +165,18 @@ mkcd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
 
+gcm() {
+  local message
+
+  if [ "$#" -eq 0 ]; then
+    message="yolo"
+  else
+    message="$*"
+  fi
+
+  git add -A && git commit -m "$message" && git push
+}
+
 dotfiles_init_brew
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 export HOMEBREW_NO_ENV_HINTS=1

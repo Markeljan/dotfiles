@@ -226,13 +226,13 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
 - optional 1Password SSH agent export via `~/.1password/agent.sock`
 - optional `zoxide` and `starship` initialization
-- one shared function: `mkcd`
+- shared functions: `mkcd`, `gcm`
 - bun shortcuts: `b`, `bi`, `br`, `bx`
 - git shortcuts: `gst`, `gfl`
 - pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`
 - Claude/Codex shortcuts: `dclaude`, `dcodex`
 
-fish uses `abbr`. bash and zsh use aliases.
+fish uses `abbr` for shared aliases. bash and zsh use aliases. Shared functions are defined separately.
 
 `fzf` is configured with a right-hand 50% preview split and `~/.local/bin/fzf-preview`.
 
