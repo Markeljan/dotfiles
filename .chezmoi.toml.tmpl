@@ -2,7 +2,7 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 {{ $linuxSshBootstrapExtras := list }}
 {{ if and (eq .chezmoi.os "linux") (stdinIsATTY) }}
-{{ $linuxSshBootstrapExtras = promptMultichoice . "bootstrap.linux_ssh_extras" "Select optional Linux SSH bootstrap extras" (list "desktop-vnc" "desktop-rdp" "openclaw") (list) }}
+{{ $linuxSshBootstrapExtras = promptMultichoice "Select optional Linux SSH bootstrap extras" (list "desktop-vnc" "desktop-rdp" "openclaw") (list) }}
 {{ end }}
 
 [data.bootstrap]
