@@ -1,0 +1,4 @@
+[bootstrap]
+linux_ssh_extras = []
+install_xfce_desktop = false
+install_openclaw = false

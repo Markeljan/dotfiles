@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+{{ $bootstrap := get . "bootstrap" | default dict }}
+{{ $installXfceDesktop := get $bootstrap "install_xfce_desktop" | default false }}
+{{ $installDesktop := get $bootstrap "install_desktop" | default false }}
+{{ $installRdp := get $bootstrap "install_rdp" | default false }}
+{{ $installChrome := get $bootstrap "install_chrome" | default false }}
+{{ $installOpenClaw := get $bootstrap "install_openclaw" | default false }}
+
 log() {
   printf '[dotfiles packages] %s\n' "$*"
 }
@@ -260,6 +267,131 @@ install_apt_packages() {
   fi
 }
 
+upgrade_apt_packages() {
+  log "upgrading installed apt packages"
+  run_sudo env DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+}
+
+install_linux_desktop_packages() {
+  local -a packages=(
+    xfce4
+    xfce4-goodies
+    xorg
+    dbus-x11
+    x11-xserver-utils
+    wget
+    curl
+    unzip
+  )
+  local -a missing=()
+  local package
+
+  for package in "${packages[@]}"; do
+    if ! dpkg -s "$package" >/dev/null 2>&1; then
+      missing+=("$package")
+    fi
+  done
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    log "installing XFCE desktop packages: ${missing[*]}"
+    run_sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+  fi
+}
+
+ensure_xfce_session() {
+  local session_file="$HOME/.xsession"
+
+  if [ -f "$session_file" ]; then
+    if grep -Fxq "startxfce4" "$session_file"; then
+      return
+    fi
+
+    warn "$session_file already exists; leaving it unchanged"
+    return
+  fi
+
+  printf 'startxfce4\n' > "$session_file"
+}
+
+install_xrdp() {
+  if ! dpkg -s xrdp >/dev/null 2>&1; then
+    log "installing xrdp"
+    run_sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y xrdp
+  fi
+
+  if ! have systemctl; then
+    warn "systemctl is not available; enable and start xrdp manually"
+    return
+  fi
+
+  run_sudo systemctl enable xrdp >/dev/null 2>&1 || warn "could not enable xrdp automatically"
+  run_sudo systemctl start xrdp >/dev/null 2>&1 || warn "could not start xrdp automatically"
+}
+
+install_google_chrome() {
+  local architecture
+  local archive_dir
+  local archive_path
+
+  if dpkg -s google-chrome-stable >/dev/null 2>&1; then
+    return
+  fi
+
+  architecture="$(dpkg --print-architecture 2>/dev/null || true)"
+  case "$architecture" in
+    amd64|"")
+      ;;
+    *)
+      warn "skipping Google Chrome install on unsupported architecture: $architecture"
+      return
+      ;;
+  esac
+
+  archive_dir="$(mktemp -d)"
+  archive_path="$archive_dir/google-chrome-stable_current_amd64.deb"
+
+  log "installing Google Chrome"
+  download_to "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" "$archive_path"
+  run_sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "$archive_path"
+  rm -rf "$archive_dir"
+}
+
+install_openclaw() {
+  if have openclaw; then
+    return
+  fi
+
+  log "installing OpenClaw"
+  download "https://openclaw.ai/install.sh" | bash -s -- --no-onboard
+}
+
+install_optional_linux_bootstrap_extras() {
+  {{- if not (or $installXfceDesktop $installDesktop $installRdp $installChrome $installOpenClaw) }}
+  return
+  {{- else }}
+  {{- if or $installXfceDesktop $installDesktop }}
+  upgrade_apt_packages
+  install_linux_desktop_packages
+  ensure_xfce_session
+  {{- end }}
+
+  {{- if and $installRdp (not (or $installXfceDesktop $installDesktop)) }}
+  warn "xrdp was selected without desktop; no XFCE session was configured"
+  {{- end }}
+  {{- if or $installXfceDesktop $installRdp }}
+  install_xrdp
+  {{- end }}
+
+  {{- if or $installXfceDesktop $installChrome }}
+  install_google_chrome
+  {{- end }}
+
+  {{- if $installOpenClaw }}
+  install_openclaw
+  {{- end }}
+  {{- end }}
+}
+
 install_starship() {
   if [ -x "$HOME/.local/bin/starship" ] || have starship; then
     return
@@ -392,6 +524,7 @@ main() {
       ;;
     linux)
       install_apt_packages
+      install_optional_linux_bootstrap_extras
       ;;
     *)
       warn "unsupported operating system: {{ .chezmoi.os }}"

@@ -25,6 +25,11 @@ If chezmoi is already installed:
 chezmoi init --apply Markeljan
 ```
 
+On Linux hosts reached over SSH, `chezmoi init --apply` now offers an optional multiselect prompt for bootstrap extras. All options default to unselected, and you can pick any combination of:
+
+- `xfce-desktop` for XFCE, Xorg, `xrdp`, Google Chrome on `amd64`, and a `~/.xsession` with `startxfce4` when one is not already present
+- `openclaw` for `openclaw.ai` with onboarding disabled
+
 Because this repo is named `dotfiles`, `chezmoi init Markeljan` uses chezmoi's default GitHub URL guessing and resolves to the `Markeljan/dotfiles` repo.
 
 If `fish` does not become the login shell automatically, run:
@@ -44,6 +49,14 @@ Skip the login-shell change when testing:
 
 ```bash
 DOTFILES_SKIP_LOGIN_SHELL=1 chezmoi apply
+```
+
+Preseed the Linux-over-SSH bootstrap extras explicitly:
+
+```bash
+chezmoi init --apply \
+  --promptMultichoice 'Select optional Linux SSH bootstrap extras=xfce-desktop/openclaw' \
+  Markeljan
 ```
 
 ## New VPS Example
@@ -275,6 +288,7 @@ Package definitions live in `.chezmoidata/packages.toml`.
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
 - when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
+- On interactive Linux SSH bootstraps, dotfiles can optionally install an `xfce-desktop` bundle with XFCE, `xrdp`, and Google Chrome, plus OpenClaw; all of these extras default to off
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer

@@ -10,6 +10,8 @@ This repo is a minimal chezmoi-managed dotfiles baseline for macOS, Debian, and 
 
 On Ubuntu, prefer `sudo snap install chezmoi --classic` and then `chezmoi init --apply Markeljan`.
 
+On interactive Linux SSH bootstraps, `chezmoi init --apply Markeljan` may prompt for optional extras. All default to off, and the user can choose any combination of `xfce-desktop` and `openclaw`.
+
 If chezmoi is not installed and `snap` is unavailable, use `sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Markeljan`.
 
 Because the repo is named `dotfiles`, `chezmoi init Markeljan` uses chezmoi's default GitHub URL guessing and resolves to `Markeljan/dotfiles`.
@@ -41,6 +43,7 @@ Top-level shell files are created when missing. `~/.ssh/config` is created by a 
 On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked to `~/.config/ghostty/config`.
 
 Package bootstrap does not install Cursor, Visual Studio Code, or GitHub Desktop. On macOS, dotfiles only links their CLI helpers into `~/.local/bin` when the matching app bundle already exists in `/Applications` or `~/Applications`.
+On interactive Linux SSH bootstraps, package bootstrap can also opt into an `xfce-desktop` bundle with XFCE desktop packages, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw.
 
 ## Constraints
 
