@@ -95,7 +95,7 @@ chezmoi init --apply Markeljan
 What happens:
 
 - chezmoi clones the repo into its source directory
-- the package script installs the baseline packages with APT and Homebrew formulae, plus `fnm`, Node.js LTS, `uv`, and `bun`
+- the package script installs the baseline packages with APT and Homebrew formulae, installs `claude-code@latest` and `codex` with Homebrew when `claude` or `codex` are missing, and then installs `fnm`, Node.js LTS, `uv`, and `bun`
 - on macOS, app-provided CLI helpers are linked into `~/.local/bin` only when the matching app bundle is already installed
 - your shell, SSH, Neovim, and prompt config are applied
 - dotfiles tries to set `fish` as the login shell
@@ -210,7 +210,7 @@ This repo stays intentionally small:
 - SSH client config with optional 1Password agent wiring
 - append-safe `authorized_keys` generation from shared and local files
 - minimal Neovim with a left file tree and editor pane
-- package bootstrap with APT and Homebrew formulae, plus `fnm`, Node.js LTS, `uv`, and `bun`
+- package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
 
 ## Managed files
@@ -302,13 +302,15 @@ When using Ghostty over SSH, the macOS Ghostty config keeps only `sudo` shell in
 
 ## Packages
 
-Package definitions live in `.chezmoidata/packages.toml`.
+Baseline package definitions live in `.chezmoidata/packages.toml`. The package script also conditionally installs `claude-code@latest` and `codex` with Homebrew when those commands are missing.
 
 - macOS uses Homebrew formulae for repo-managed packages
 - Debian and Ubuntu use APT for baseline packages and Homebrew for `fnm`
+- Debian and Ubuntu use Homebrew for `claude-code@latest`, `codex`, and `fnm`
 - Debian and Ubuntu install the Homebrew prerequisites from the official Homebrew docs
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
+- On macOS and Linux, dotfiles installs `claude-code@latest` when `claude` is missing and `codex` when `codex` is missing
 - when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
 - On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off

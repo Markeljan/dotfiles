@@ -145,6 +145,32 @@ install_brew_packages() {
   fi
 }
 
+install_claude_code_and_codex() {
+  local brew_ready=0
+
+  if ! have claude; then
+    if [ "$brew_ready" -eq 0 ]; then
+      install_homebrew
+      eval_brew_shellenv
+      brew_ready=1
+    fi
+
+    log "installing Claude Code"
+    brew install claude-code@latest
+  fi
+
+  if ! have codex; then
+    if [ "$brew_ready" -eq 0 ]; then
+      install_homebrew
+      eval_brew_shellenv
+      brew_ready=1
+    fi
+
+    log "installing Codex"
+    brew install codex
+  fi
+}
+
 install_fnm() {
   install_homebrew
   eval_brew_shellenv
@@ -708,6 +734,7 @@ main() {
       ;;
   esac
 
+  install_claude_code_and_codex
   install_uv
   install_bun
   install_fnm
