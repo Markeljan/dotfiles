@@ -234,7 +234,7 @@ The shared shell model lives in `.chezmoidata/shell.toml`.
 
 v1 keeps the shell layer intentionally plain, with a few restored workflow helpers:
 
-- shared PATH entries for `~/bin`, `~/.local/bin`, and `~/.bun/bin`
+- shared PATH entries for `~/.local/bin` and `~/.bun/bin`
 - optional `brew shellenv`
 - optional `fnm` initialization with Node.js LTS via `fnm`
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`

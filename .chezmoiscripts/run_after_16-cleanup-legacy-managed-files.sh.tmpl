@@ -76,3 +76,6 @@ EOF
 if [ -f "$HOME/.config/nvim/init.lua" ] && [ -e "$HOME/.config/nvim/init.vim" ]; then
   rm -f "$HOME/.config/nvim/init.vim"
 fi
+
+# Older revisions created ~/bin even though the repo now standardizes on ~/.local/bin.
+rmdir "$HOME/bin" 2>/dev/null || true

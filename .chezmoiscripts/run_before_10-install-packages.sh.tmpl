@@ -54,12 +54,7 @@ download_to() {
 }
 
 ensure_local_bin() {
-  mkdir -p "$HOME/bin" "$HOME/.local/bin"
-
-  case ":$PATH:" in
-    *":$HOME/bin:"*) ;;
-    *) export PATH="$HOME/bin:$PATH" ;;
-  esac
+  mkdir -p "$HOME/.local/bin"
 
   case ":$PATH:" in
     *":$HOME/.local/bin:"*) ;;

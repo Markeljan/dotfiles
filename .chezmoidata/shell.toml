@@ -1,6 +1,5 @@
 [shell]
 path_entries = [
-  "bin",
   ".local/bin",
   ".bun/bin",
 ]

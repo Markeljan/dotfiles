@@ -76,6 +76,7 @@ grep -Fq '# local machine change' "$tmp_home/.config/fish/config.fish"
 HOME="$tmp_home" nvim --headless "+qa" || true
 test -f "$tmp_home/.ssh/authorized_keys.shared"
 test -f "$tmp_home/.ssh/authorized_keys"
+test ! -e "$tmp_home/bin"
 test ! -e "$tmp_home/.config/nvim/init.vim"
 test ! -e "$tmp_home/.tmux.conf"
 test ! -e "$tmp_home/CLAUDE.md"
