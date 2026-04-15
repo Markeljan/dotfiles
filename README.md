@@ -227,9 +227,9 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
 - optional 1Password SSH agent export via `~/.1password/agent.sock`
 - optional `zoxide` and `starship` initialization
-- shared functions: `mkcd`, `gcm`
+- shared functions: `mkcd`, `gc`
 - bun shortcuts: `b`, `bi`, `br`, `bx`
-- git shortcuts: `gst`, `gfl`
+- git shortcuts: `ga`, `gp`, `gst`, `gfl`
 - pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`
 - Claude/Codex shortcuts: `dclaude`, `dcodex`
 

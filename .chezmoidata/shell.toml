@@ -35,6 +35,14 @@ name = "gst"
 expansion = "git status"
 
 [[shell.aliases]]
+name = "ga"
+expansion = "git add"
+
+[[shell.aliases]]
+name = "gp"
+expansion = "git push"
+
+[[shell.aliases]]
 name = "gfl"
 expansion = "git fetch && git pull"
 

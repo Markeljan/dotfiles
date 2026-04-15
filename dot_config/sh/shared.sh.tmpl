@@ -165,7 +165,7 @@ mkcd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
 
-gcm() {
+gc() {
   local message
 
   if [ "$#" -eq 0 ]; then
@@ -174,7 +174,7 @@ gcm() {
     message="$*"
   fi
 
-  git add -A && git commit -m "$message" && git push
+  git commit -m "$message"
 }
 
 dotfiles_init_brew
