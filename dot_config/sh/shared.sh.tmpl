@@ -125,18 +125,6 @@ dotfiles_init_brew() {
   {{- end }}
 }
 
-dotfiles_set_ssh_agent() {
-  local socket
-
-  {{- range .shell.ssh_agent_sockets }}
-  socket="$HOME/{{ . }}"
-  if [ -S "$socket" ]; then
-    export SSH_AUTH_SOCK="$socket"
-    return
-  fi
-  {{- end }}
-}
-
 dotfiles_set_safe_term() {
   if [ "${TERM:-}" != "xterm-ghostty" ]; then
     return
@@ -192,7 +180,6 @@ export OPENCLAW_NO_RESPAWN=1
 {{- range .shell.path_entries }}
 path_prepend "$HOME/{{ . }}"
 {{- end }}
-dotfiles_set_ssh_agent
 dotfiles_set_safe_term
 
 {{- range .shell.aliases }}

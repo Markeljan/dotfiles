@@ -33,22 +33,15 @@ EOF
 
 ensure_ssh_includes() {
   local config_path="$HOME/.ssh/config"
-  local marker_start="# >>> dotfiles ssh >>>"
 
   if [ ! -f "$config_path" ]; then
     mkdir -p "$HOME/.ssh"
     cat > "$config_path" <<'EOF'
 # Local top-level SSH config created by dotfiles.
 Include ~/.orbstack/ssh/config
-Include ~/.ssh/1Password/config
-Include ~/.ssh/config.shared
 Include ~/.ssh/config.local
 EOF
     chmod 600 "$config_path"
-    return
-  fi
-
-  if grep -Fq "$marker_start" "$config_path" || grep -Fq "Include ~/.ssh/config.shared" "$config_path"; then
     return
   fi
 
@@ -60,10 +53,46 @@ path = Path(sys.argv[1])
 lines = path.read_text().splitlines(keepends=True)
 block = [
     "# >>> dotfiles ssh >>>\n",
-    "Include ~/.ssh/config.shared\n",
     "Include ~/.ssh/config.local\n",
     "# <<< dotfiles ssh <<<\n",
 ]
+lines = [line for line in lines if line.strip() != "Include ~/.ssh/config.shared"]
+
+created_header = "# Local top-level SSH config created by dotfiles.\n"
+if lines[:1] == [created_header]:
+    normalized_lines = [
+        created_header,
+        "Include ~/.orbstack/ssh/config\n",
+        "Include ~/.ssh/config.local\n",
+    ]
+    for line in lines[1:]:
+        stripped = line.strip()
+        if stripped.startswith("Include "):
+            continue
+        normalized_lines.append(line)
+    path.write_text("".join(normalized_lines))
+    raise SystemExit
+
+marker_start = block[0]
+marker_end = block[-1]
+start = None
+end = None
+
+for index, line in enumerate(lines):
+    if line == marker_start:
+        start = index
+    elif line == marker_end and start is not None:
+        end = index
+        break
+
+if start is not None and end is not None:
+    lines[start : end + 1] = block
+    path.write_text("".join(lines))
+    raise SystemExit
+
+if any(line.strip() == "Include ~/.ssh/config.local" for line in lines):
+    path.write_text("".join(lines))
+    raise SystemExit
 
 insert_at = len(lines)
 for index, line in enumerate(lines):

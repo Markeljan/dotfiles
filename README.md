@@ -207,7 +207,7 @@ This repo stays intentionally small:
 - `fzf` preview configuration and `fzf-preview`
 - shell completions for common installed tools in bash, zsh, and fish
 - `tmux` installed without repo-managed auto-attach or custom config
-- SSH client config with optional 1Password agent wiring
+- local SSH top-level config passthrough with `config.local`
 - append-safe `authorized_keys` generation from shared and local files
 - minimal Neovim with a left file tree and editor pane
 - package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
@@ -224,7 +224,6 @@ This repo stays intentionally small:
 - `~/.config/fish/functions/mkcd.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
-- `~/.ssh/config.shared`
 - `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
@@ -261,7 +260,6 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional `brew shellenv`
 - optional `fnm` initialization with Node.js LTS via `fnm`
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
-- optional 1Password SSH agent export via `~/.1password/agent.sock`
 - optional `zoxide` and `starship` initialization
 - shared functions: `mkcd`, `gc`
 - bun shortcuts: `b`, `bi`, `br`, `bx`
@@ -279,20 +277,14 @@ fish uses `abbr` for shared aliases. bash and zsh use aliases. Shared functions 
 
 ## SSH behavior
 
-`~/.ssh/config.shared` is repo-managed and contains:
-
-- generic client defaults
-- optional 1Password SSH agent wiring for both `~/.1password/agent.sock` and the macOS Group Containers socket path
-
 `~/.ssh/config` is treated as local. On machines where it already exists, dotfiles adds:
 
-- `Include ~/.ssh/config.shared`
 - `Include ~/.ssh/config.local`
 
 On machines with no existing `~/.ssh/config`, the post-apply hook creates a minimal top-level file that also includes:
 
 - `Include ~/.orbstack/ssh/config`
-- `Include ~/.ssh/1Password/config`
+- `Include ~/.ssh/config.local`
 
 `authorized_keys` is generated on every `chezmoi apply` from:
 

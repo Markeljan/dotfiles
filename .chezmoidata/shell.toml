@@ -8,10 +8,6 @@ brew_candidates = [
   "/usr/local/bin/brew",
   "/home/linuxbrew/.linuxbrew/bin/brew",
 ]
-ssh_agent_sockets = [
-  ".1password/agent.sock",
-  "Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock",
-]
 
 [[shell.aliases]]
 name = "b"
