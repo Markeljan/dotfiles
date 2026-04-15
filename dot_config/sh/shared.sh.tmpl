@@ -12,6 +12,8 @@ path_prepend() {
   esac
 }
 
+{{ $bootstrap := get . "bootstrap" | default dict }}
+
 dotfiles_have() {
   command -v "$1" >/dev/null 2>&1
 }
@@ -180,6 +182,13 @@ gc() {
 dotfiles_init_brew
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 export HOMEBREW_NO_ENV_HINTS=1
+{{- if get $bootstrap "install_desktop_vnc" | default false }}
+export DISPLAY=:99
+{{- end }}
+{{- if get $bootstrap "install_openclaw" | default false }}
+export NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
+export OPENCLAW_NO_RESPAWN=1
+{{- end }}
 {{- range .shell.path_entries }}
 path_prepend "$HOME/{{ . }}"
 {{- end }}

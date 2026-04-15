@@ -2,10 +2,11 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 {{ $linuxSshBootstrapExtras := list }}
 {{ if and (eq .chezmoi.os "linux") (ne (env "SSH_CONNECTION") "") (stdinIsATTY) }}
-{{ $linuxSshBootstrapExtras = promptMultichoiceOnce . "bootstrap.linux_ssh_extras" "Select optional Linux SSH bootstrap extras" (list "xfce-desktop" "openclaw") (list) }}
+{{ $linuxSshBootstrapExtras = promptMultichoice . "bootstrap.linux_ssh_extras" "Select optional Linux SSH bootstrap extras" (list "desktop-vnc" "desktop-rdp" "openclaw") (list) }}
 {{ end }}
 
 [data.bootstrap]
 linux_ssh_extras = {{ $linuxSshBootstrapExtras | toToml }}
-install_xfce_desktop = {{ has "xfce-desktop" $linuxSshBootstrapExtras }}
+install_desktop_vnc = {{ has "desktop-vnc" $linuxSshBootstrapExtras }}
+install_desktop_rdp = {{ or (has "desktop-rdp" $linuxSshBootstrapExtras) (has "xfce-desktop" $linuxSshBootstrapExtras) }}
 install_openclaw = {{ has "openclaw" $linuxSshBootstrapExtras }}

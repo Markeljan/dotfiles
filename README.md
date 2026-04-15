@@ -25,10 +25,11 @@ If chezmoi is already installed:
 chezmoi init --apply Markeljan
 ```
 
-On Linux hosts reached over SSH, `chezmoi init --apply` now offers an optional multiselect prompt for bootstrap extras. All options default to unselected, and you can pick any combination of:
+On Linux hosts reached over SSH, each interactive `chezmoi init --apply` run offers an optional multiselect prompt for bootstrap extras. All options default to unselected, and you can pick any combination of:
 
-- `xfce-desktop` for XFCE, Xorg, `xrdp`, Google Chrome on `amd64`, and a `~/.xsession` with `startxfce4` when one is not already present
-- `openclaw` for `openclaw.ai` with onboarding disabled
+- `desktop-vnc` for a headless VNC desktop with `Xvfb`, `x11vnc`, Openbox, and Google Chrome on `amd64`; the bootstrap tries to run `x11vnc -storepasswd`, enables a systemd service that keeps the display stack running, and exports `DISPLAY=:99` from the shared shell config
+- `desktop-rdp` for XFCE, Xorg, `xrdp`, Google Chrome on `amd64`, and a `~/.xsession` with `startxfce4` when one is not already present
+- `openclaw` for `openclaw.ai` with onboarding disabled, `NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache`, and `OPENCLAW_NO_RESPAWN=1`
 
 Because this repo is named `dotfiles`, `chezmoi init Markeljan` uses chezmoi's default GitHub URL guessing and resolves to the `Markeljan/dotfiles` repo.
 
@@ -55,9 +56,31 @@ Preseed the Linux-over-SSH bootstrap extras explicitly:
 
 ```bash
 chezmoi init --apply \
-  --promptMultichoice 'Select optional Linux SSH bootstrap extras=xfce-desktop/openclaw' \
+  --promptMultichoice 'Select optional Linux SSH bootstrap extras=desktop-vnc/desktop-rdp/openclaw' \
   Markeljan
 ```
+
+If you re-run `chezmoi init --apply` later and unselect `desktop-vnc` or `desktop-rdp`, dotfiles disables and stops the corresponding service but leaves installed packages in place.
+
+If you choose `openclaw`, dotfiles also creates `/var/tmp/openclaw-compile-cache` when possible and exports:
+
+```bash
+export NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
+export OPENCLAW_NO_RESPAWN=1
+```
+
+Re-running `chezmoi init --apply` with `openclaw` selected applies the same config to existing installs too.
+
+If you choose `desktop-vnc`, dotfiles stores a VNC password, writes `~/.local/bin/dotfiles-start-vnc-display`, and enables a systemd service that runs:
+
+```bash
+Xvfb :99 -screen 0 1920x1200x24 &
+export DISPLAY=:99
+openbox &
+x11vnc -display :99 -forever -shared -rfbauth "$HOME/.vnc/passwd" -rfbport 5900 -ncache 10 -noxdamage
+```
+
+Openbox keeps window focus sane and avoids some Chrome glitches compared with a bare virtual display. The service starts on boot, so you can connect to `vnc://HOST:5900` at any time after the password exists.
 
 ## New VPS Example
 
@@ -288,7 +311,7 @@ Package definitions live in `.chezmoidata/packages.toml`.
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
 - when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
-- On interactive Linux SSH bootstraps, dotfiles can optionally install an `xfce-desktop` bundle with XFCE, `xrdp`, and Google Chrome, plus OpenClaw; all of these extras default to off
+- On interactive Linux SSH bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache` and `OPENCLAW_NO_RESPAWN=1`; all of these extras default to off
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer

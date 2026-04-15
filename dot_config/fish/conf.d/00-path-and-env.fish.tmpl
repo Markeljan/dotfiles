@@ -1,5 +1,16 @@
+{{ $bootstrap := get . "bootstrap" | default dict }}
+
 {{- range .shell.path_entries }}
 fish_add_path -p "$HOME/{{ . }}"
+{{- end }}
+
+{{- if get $bootstrap "install_desktop_vnc" | default false }}
+set -gx DISPLAY :99
+{{- end }}
+
+{{- if get $bootstrap "install_openclaw" | default false }}
+set -gx NODE_COMPILE_CACHE /var/tmp/openclaw-compile-cache
+set -gx OPENCLAW_NO_RESPAWN 1
 {{- end }}
 
 for socket in {{- range .shell.ssh_agent_sockets }} "$HOME/{{ . }}"{{- end }}

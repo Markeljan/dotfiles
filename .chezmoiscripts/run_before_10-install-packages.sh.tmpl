@@ -2,11 +2,16 @@
 set -euo pipefail
 
 {{ $bootstrap := get . "bootstrap" | default dict }}
-{{ $installXfceDesktop := get $bootstrap "install_xfce_desktop" | default false }}
-{{ $installDesktop := get $bootstrap "install_desktop" | default false }}
-{{ $installRdp := get $bootstrap "install_rdp" | default false }}
-{{ $installChrome := get $bootstrap "install_chrome" | default false }}
+{{ $linuxSshBootstrapExtras := get $bootstrap "linux_ssh_extras" | default list }}
+{{ $installLegacyXfceDesktop := or (get $bootstrap "install_xfce_desktop" | default false) (has "xfce-desktop" $linuxSshBootstrapExtras) }}
+{{ $installDesktopVnc := or (get $bootstrap "install_desktop_vnc" | default false) (has "desktop-vnc" $linuxSshBootstrapExtras) }}
+{{ $installDesktopRdp := or (get $bootstrap "install_desktop_rdp" | default false) (has "desktop-rdp" $linuxSshBootstrapExtras) $installLegacyXfceDesktop }}
+{{ $installChrome := or (get $bootstrap "install_chrome" | default false) $installDesktopVnc $installDesktopRdp }}
 {{ $installOpenClaw := get $bootstrap "install_openclaw" | default false }}
+{{ $vncServiceName := "dotfiles-vnc-display.service" }}
+{{ $vncServicePath := printf "/etc/systemd/system/%s" $vncServiceName }}
+{{ $vncStartScript := printf "%s/.local/bin/dotfiles-start-vnc-display" .chezmoi.homeDir }}
+{{ $openClawCompileCache := "/var/tmp/openclaw-compile-cache" }}
 
 log() {
   printf '[dotfiles packages] %s\n' "$*"
@@ -288,6 +293,27 @@ install_linux_desktop_packages() {
   fi
 }
 
+install_vnc_desktop_packages() {
+  local -a packages=(
+    xvfb
+    x11vnc
+    openbox
+  )
+  local -a missing=()
+  local package
+
+  for package in "${packages[@]}"; do
+    if ! dpkg -s "$package" >/dev/null 2>&1; then
+      missing+=("$package")
+    fi
+  done
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    log "installing headless VNC desktop packages: ${missing[*]}"
+    run_sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+  fi
+}
+
 ensure_xfce_session() {
   local session_file="$HOME/.xsession"
 
@@ -308,14 +334,155 @@ install_xrdp() {
     log "installing xrdp"
     run_sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y xrdp
   fi
+}
 
+disable_xrdp() {
   if ! have systemctl; then
-    warn "systemctl is not available; enable and start xrdp manually"
     return
   fi
 
+  run_sudo systemctl disable --now xrdp xrdp-sesman >/dev/null 2>&1 || true
+  run_sudo systemctl reset-failed xrdp xrdp-sesman >/dev/null 2>&1 || true
+}
+
+reconcile_xrdp_service() {
+  if ! have systemctl; then
+    {{- if $installDesktopRdp }}
+    warn "systemctl is not available; enable and start xrdp manually"
+    {{- end }}
+    return
+  fi
+
+  {{- if $installDesktopRdp }}
   run_sudo systemctl enable xrdp >/dev/null 2>&1 || warn "could not enable xrdp automatically"
   run_sudo systemctl start xrdp >/dev/null 2>&1 || warn "could not start xrdp automatically"
+  {{- else }}
+  disable_xrdp
+  {{- end }}
+}
+
+maybe_prompt_for_vnc_password() {
+  local password_dir="$HOME/.vnc"
+  local password_file="$password_dir/passwd"
+
+  if [ -f "$password_file" ]; then
+    return
+  fi
+
+  mkdir -p "$password_dir"
+
+  if [ ! -r /dev/tty ] || [ ! -w /dev/tty ]; then
+    warn "set a VNC password later with: x11vnc -storepasswd \"$password_file\""
+    return
+  fi
+
+  log "set a VNC password for x11vnc"
+  if ! x11vnc -storepasswd "$password_file" </dev/tty >/dev/tty 2>/dev/tty; then
+    warn "x11vnc password setup was skipped; run: x11vnc -storepasswd \"$password_file\""
+    return
+  fi
+
+  chmod 0600 "$password_file" 2>/dev/null || true
+}
+
+write_vnc_start_script() {
+  local tmp_file
+
+  tmp_file="$(mktemp)"
+  cat >"$tmp_file" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DISPLAY="${DISPLAY:-:99}"
+password_file="$HOME/.vnc/passwd"
+
+if [ ! -f "$password_file" ]; then
+  printf '[dotfiles vnc] missing VNC password file: %s\n' "$password_file" >&2
+  exit 1
+fi
+
+Xvfb "$DISPLAY" -screen 0 1920x1200x24 &
+sleep 1
+openbox &
+sleep 1
+
+exec x11vnc \
+  -display "$DISPLAY" \
+  -forever \
+  -shared \
+  -rfbauth "$password_file" \
+  -rfbport 5900 \
+  -ncache 10 \
+  -noxdamage
+EOF
+
+  install -m 0755 "$tmp_file" "{{ $vncStartScript }}"
+  rm -f "$tmp_file"
+}
+
+write_vnc_service() {
+  local tmp_file
+
+  tmp_file="$(mktemp)"
+  cat >"$tmp_file" <<EOF
+[Unit]
+Description=Dotfiles Virtual Display (Xvfb + Openbox + x11vnc)
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+Environment=HOME=$HOME
+Environment=DISPLAY=:99
+WorkingDirectory=$HOME
+ExecStart={{ $vncStartScript }}
+Restart=always
+RestartSec=2
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  run_sudo install -m 0644 "$tmp_file" "{{ $vncServicePath }}"
+  rm -f "$tmp_file"
+}
+
+disable_vnc_service() {
+  rm -f "{{ $vncStartScript }}"
+
+  if ! have systemctl; then
+    return
+  fi
+
+  run_sudo systemctl disable --now "{{ $vncServiceName }}" >/dev/null 2>&1 || true
+  run_sudo systemctl reset-failed "{{ $vncServiceName }}" >/dev/null 2>&1 || true
+  run_sudo rm -f "{{ $vncServicePath }}" >/dev/null 2>&1 || true
+  run_sudo systemctl daemon-reload >/dev/null 2>&1 || warn "could not reload systemd after removing the VNC display service"
+}
+
+reconcile_vnc_service() {
+  {{- if $installDesktopVnc }}
+  if [ ! -f "$HOME/.vnc/passwd" ]; then
+    warn "desktop-vnc is selected but $HOME/.vnc/passwd is missing; the VNC display service will stay disabled until a password is set"
+    disable_vnc_service
+    return
+  fi
+
+  write_vnc_start_script
+
+  if ! have systemctl; then
+    warn "systemctl is not available; start {{ $vncStartScript }} manually after login"
+    return
+  fi
+
+  write_vnc_service
+  run_sudo systemctl daemon-reload >/dev/null 2>&1 || warn "could not reload systemd for the VNC display service"
+  run_sudo systemctl enable "{{ $vncServiceName }}" >/dev/null 2>&1 || warn "could not enable the VNC display service automatically"
+  run_sudo systemctl restart "{{ $vncServiceName }}" >/dev/null 2>&1 || warn "could not start the VNC display service automatically"
+  {{- else }}
+  disable_vnc_service
+  {{- end }}
 }
 
 install_google_chrome() {
@@ -359,30 +526,41 @@ install_openclaw() {
   download "https://openclaw.ai/install.sh" | bash -s -- --no-onboard
 }
 
-install_optional_linux_bootstrap_extras() {
-  {{- if not (or $installXfceDesktop $installDesktop $installRdp $installChrome $installOpenClaw) }}
+ensure_openclaw_runtime_config() {
+  {{- if not $installOpenClaw }}
   return
   {{- else }}
-  {{- if or $installXfceDesktop $installDesktop }}
-  install_linux_desktop_packages
-  ensure_xfce_session
+  if mkdir -p "{{ $openClawCompileCache }}"; then
+    chmod 0700 "{{ $openClawCompileCache }}" 2>/dev/null || true
+  else
+    warn "could not create OpenClaw compile cache directory at {{ $openClawCompileCache }}"
+  fi
+  {{- end }}
+}
+
+install_optional_linux_bootstrap_extras() {
+  {{- if $installDesktopVnc }}
+  install_vnc_desktop_packages
+  maybe_prompt_for_vnc_password
   {{- end }}
 
-  {{- if and $installRdp (not (or $installXfceDesktop $installDesktop)) }}
-  warn "xrdp was selected without desktop; no XFCE session was configured"
-  {{- end }}
-  {{- if or $installXfceDesktop $installRdp }}
+  {{- if $installDesktopRdp }}
+  install_linux_desktop_packages
+  ensure_xfce_session
   install_xrdp
   {{- end }}
 
-  {{- if or $installXfceDesktop $installChrome }}
+  {{- if $installChrome }}
   install_google_chrome
   {{- end }}
 
   {{- if $installOpenClaw }}
   install_openclaw
+  ensure_openclaw_runtime_config
   {{- end }}
-  {{- end }}
+
+  reconcile_xrdp_service
+  reconcile_vnc_service
 }
 
 install_starship() {

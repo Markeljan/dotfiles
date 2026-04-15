@@ -1,4 +1,5 @@
 [bootstrap]
 linux_ssh_extras = []
-install_xfce_desktop = false
+install_desktop_vnc = false
+install_desktop_rdp = false
 install_openclaw = false
