@@ -25,7 +25,7 @@ If chezmoi is already installed:
 chezmoi init --apply Markeljan
 ```
 
-On Linux hosts reached over SSH, each interactive `chezmoi init --apply` run offers an optional multiselect prompt for bootstrap extras. All options default to unselected, and you can pick any combination of:
+On interactive Linux `chezmoi init --apply` runs, dotfiles offers an optional multiselect prompt for bootstrap extras. All options default to unselected, and you can pick any combination of:
 
 - `desktop-vnc` for a headless VNC desktop with `Xvfb`, `x11vnc`, Openbox, and Google Chrome on `amd64`; the bootstrap tries to run `x11vnc -storepasswd`, enables a systemd service that keeps the display stack running, and exports `DISPLAY=:99` from the shared shell config
 - `desktop-rdp` for XFCE, Xorg, `xrdp`, Google Chrome on `amd64`, and a `~/.xsession` with `startxfce4` when one is not already present
@@ -311,7 +311,7 @@ Package definitions live in `.chezmoidata/packages.toml`.
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
 - when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
-- On interactive Linux SSH bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache` and `OPENCLAW_NO_RESPAWN=1`; all of these extras default to off
+- On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache` and `OPENCLAW_NO_RESPAWN=1`; all of these extras default to off
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer
