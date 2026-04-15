@@ -30,20 +30,68 @@ name = "bx"
 expansion = "bun x"
 
 [[shell.aliases]]
-name = "gst"
-expansion = "git status"
+name = "cat"
+expansion = "bat --paging=never"
+
+[[shell.aliases]]
+name = "cd"
+expansion = "z"
 
 [[shell.aliases]]
 name = "ga"
 expansion = "git add"
 
 [[shell.aliases]]
-name = "gp"
-expansion = "git push"
+name = "gd"
+expansion = "git diff"
 
 [[shell.aliases]]
 name = "gfl"
 expansion = "git fetch && git pull"
+
+[[shell.aliases]]
+name = "gl"
+expansion = "git log --oneline --graph --decorate"
+
+[[shell.aliases]]
+name = "gp"
+expansion = "git push"
+
+[[shell.aliases]]
+name = "grep"
+expansion = "rg"
+
+[[shell.aliases]]
+name = "gs"
+expansion = "git status"
+
+[[shell.aliases]]
+name = "l"
+expansion = "eza -lh"
+
+[[shell.aliases]]
+name = "la"
+expansion = "eza -a"
+
+[[shell.aliases]]
+name = "ll"
+expansion = "eza -la --icons --octal-permissions --group-directories-first"
+
+[[shell.aliases]]
+name = "lt"
+expansion = "eza --tree --level=2"
+
+[[shell.aliases]]
+name = "mkdir"
+expansion = "mkdir -p"
+
+[[shell.aliases]]
+name = "procs"
+expansion = "procs --pager disable --sorta mem"
+
+[[shell.aliases]]
+name = "sys"
+expansion = "fastfetch"
 
 [[shell.aliases]]
 name = "pi"

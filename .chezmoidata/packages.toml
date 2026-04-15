@@ -1,11 +1,15 @@
 [packages.darwin]
 brew = [
+  "bat",
   "bash-completion@2",
+  "eza",
   "fish",
   "fd",
+  "fastfetch",
   "fzf",
   "gh",
   "neovim",
+  "procs",
   "ripgrep",
   "starship",
   "tmux",
@@ -45,6 +49,14 @@ apt = [
   "neovim",
   "ripgrep",
   "tmux",
+]
+
+[packages.linux]
+brew = [
+  "bat",
+  "eza",
+  "fastfetch",
+  "procs",
 ]
 
 [packages.uv]

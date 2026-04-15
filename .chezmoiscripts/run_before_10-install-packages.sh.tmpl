@@ -183,6 +183,29 @@ install_fnm() {
   brew install fnm
 }
 
+install_linux_brew_packages() {
+  {{- if eq .chezmoi.os "linux" }}
+  local brew_ready=0
+
+  {{- range .packages.linux.brew }}
+  if ! have "{{ . }}"; then
+    if [ "$brew_ready" -eq 0 ]; then
+      install_homebrew
+      eval_brew_shellenv
+      brew_ready=1
+    fi
+
+    if ! brew list --versions "{{ . }}" >/dev/null 2>&1; then
+      log "installing {{ . }} with Homebrew"
+      brew install "{{ . }}"
+    fi
+  fi
+  {{- end }}
+  {{- else }}
+  :
+  {{- end }}
+}
+
 fnm_has_installed_lts() {
   fnm list 2>/dev/null | grep -Fq 'lts-latest'
 }
@@ -738,6 +761,7 @@ main() {
   install_uv
   install_bun
   install_fnm
+  install_linux_brew_packages
   install_node_lts
   ensure_fd_symlink
   install_uv_tools

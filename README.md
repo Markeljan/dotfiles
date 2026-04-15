@@ -265,7 +265,11 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional `zoxide` and `starship` initialization
 - shared functions: `mkcd`, `gc`
 - bun shortcuts: `b`, `bi`, `br`, `bx`
-- git shortcuts: `ga`, `gp`, `gst`, `gfl`
+- shell shortcuts: `cat`, `grep`, `mkdir`, `cd`
+- `eza` shortcuts: `l`, `la`, `ll`, `lt`
+- git shortcuts: `ga`, `gd`, `gl`, `gp`, `gs`, `gfl`
+- system shortcut: `sys`
+- `procs` default: `procs --pager disable --sorta mem`
 - pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`
 - Claude/Codex shortcuts: `dclaude`, `dcodex`
 
@@ -305,8 +309,7 @@ When using Ghostty over SSH, the macOS Ghostty config keeps only `sudo` shell in
 Baseline package definitions live in `.chezmoidata/packages.toml`. The package script also conditionally installs `claude-code@latest` and `codex` with Homebrew when those commands are missing.
 
 - macOS uses Homebrew formulae for repo-managed packages
-- Debian and Ubuntu use APT for baseline packages and Homebrew for `fnm`
-- Debian and Ubuntu use Homebrew for `claude-code@latest`, `codex`, and `fnm`
+- Debian and Ubuntu use APT for baseline packages and Homebrew for `bat`, `eza`, `fastfetch`, `procs`, `claude-code@latest`, `codex`, and `fnm`
 - Debian and Ubuntu install the Homebrew prerequisites from the official Homebrew docs
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
