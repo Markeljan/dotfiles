@@ -576,8 +576,25 @@ install_openclaw() {
     return
   fi
 
+  if ! have bun && [ ! -x "$HOME/.bun/bin/bun" ]; then
+    install_bun || {
+      warn "bun is required to install OpenClaw"
+      return 1
+    }
+  fi
+
+  if ! have bun && [ -x "$HOME/.bun/bin/bun" ]; then
+    export PATH="$HOME/.bun/bin:$PATH"
+  fi
+
+  if ! have bun; then
+    warn "bun is required to install OpenClaw"
+    return 1
+  fi
+
   log "installing OpenClaw"
-  download "https://openclaw.ai/install.sh" | bash -s -- --no-onboard
+  bun install --global openclaw@2026.4.12
+  bun pm --global trust --all
 }
 
 ensure_openclaw_runtime_config() {

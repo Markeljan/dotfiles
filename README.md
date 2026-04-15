@@ -29,7 +29,7 @@ On interactive Linux `chezmoi init --apply` runs, dotfiles offers an optional mu
 
 - `desktop-vnc` for a headless VNC desktop with `Xvfb`, `x11vnc`, Openbox, and Google Chrome on `amd64`; the bootstrap tries to run `x11vnc -storepasswd`, enables a systemd service that keeps the display stack running, and exports `DISPLAY=:99` from the shared shell config
 - `desktop-rdp` for XFCE, Xorg, `xrdp`, Google Chrome on `amd64`, and a `~/.xsession` with `startxfce4` when one is not already present
-- `openclaw` for `openclaw.ai` with onboarding disabled, `NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache`, and `OPENCLAW_NO_RESPAWN=1`
+- `openclaw` for a global Bun install of `openclaw@2026.4.12`, followed by `bun pm --global trust --all`, plus `NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache` and `OPENCLAW_NO_RESPAWN=1`
 
 Because this repo is named `dotfiles`, `chezmoi init Markeljan` uses chezmoi's default GitHub URL guessing and resolves to the `Markeljan/dotfiles` repo.
 
@@ -69,7 +69,14 @@ export NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
 export OPENCLAW_NO_RESPAWN=1
 ```
 
-and writes an OpenClaw gateway systemd user drop-in so the service gets the same env. When `desktop-vnc` is also selected, that drop-in adds `DISPLAY=:99` so `openclaw browser open ...` targets the VNC display too. Re-running `chezmoi init --apply` with `openclaw` selected applies the same config to existing installs too.
+and installs OpenClaw with:
+
+```bash
+bun install --global openclaw@2026.4.12
+bun pm --global trust --all
+```
+
+It also writes an OpenClaw gateway systemd user drop-in so the service gets the same env. When `desktop-vnc` is also selected, that drop-in adds `DISPLAY=:99` so `openclaw browser open ...` targets the VNC display too. Re-running `chezmoi init --apply` with `openclaw` selected applies the same config to existing installs too.
 
 If you choose `desktop-vnc`, dotfiles stores a VNC password, writes `~/.local/bin/dotfiles-start-vnc-display`, and enables a systemd service that runs:
 
@@ -308,7 +315,7 @@ Baseline package definitions live in `.chezmoidata/packages.toml`. The package s
 - On macOS and Linux, dotfiles installs `claude-code@latest` when `claude` is missing and `codex` when `codex` is missing
 - when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
-- On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off
+- On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw via `bun install --global openclaw@2026.4.12` and `bun pm --global trust --all`, with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer
