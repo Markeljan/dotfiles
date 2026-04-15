@@ -262,11 +262,6 @@ install_apt_packages() {
   fi
 }
 
-upgrade_apt_packages() {
-  log "upgrading installed apt packages"
-  run_sudo env DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
-}
-
 install_linux_desktop_packages() {
   local -a packages=(
     xfce4
@@ -345,8 +340,12 @@ install_google_chrome() {
   archive_dir="$(mktemp -d)"
   archive_path="$archive_dir/google-chrome-stable_current_amd64.deb"
 
+  # Let apt's _apt sandbox read the local archive instead of falling back to root.
+  chmod 0755 "$archive_dir"
+
   log "installing Google Chrome"
   download_to "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" "$archive_path"
+  chmod 0644 "$archive_path"
   run_sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "$archive_path"
   rm -rf "$archive_dir"
 }
@@ -365,7 +364,6 @@ install_optional_linux_bootstrap_extras() {
   return
   {{- else }}
   {{- if or $installXfceDesktop $installDesktop }}
-  upgrade_apt_packages
   install_linux_desktop_packages
   ensure_xfce_session
   {{- end }}
