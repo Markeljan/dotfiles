@@ -77,7 +77,7 @@ If you choose `desktop-vnc`, dotfiles stores a VNC password, writes `~/.local/bi
 Xvfb :99 -screen 0 "$DOTFILES_VNC_SCREEN" &
 export DISPLAY=:99
 openbox &
-x11vnc -display :99 -forever -shared -rfbauth "$HOME/.vnc/passwd" -rfbport 5900 -ncache 10 -noxdamage
+x11vnc -display :99 -forever -shared -rfbauth "$HOME/.vnc/passwd" -rfbport 5900 -noxdamage
 ```
 
 Openbox keeps window focus sane and avoids some Chrome glitches compared with a bare virtual display. The service starts on boot, defaults to `DOTFILES_VNC_SCREEN=1440x900x24`, and can be overridden with a systemd service override if you want a different size. You can connect to `vnc://HOST:5900` at any time after the password exists.
