@@ -62,25 +62,25 @@ chezmoi init --apply \
 
 If you re-run `chezmoi init --apply` later and unselect `desktop-vnc` or `desktop-rdp`, dotfiles disables and stops the corresponding service but leaves installed packages in place.
 
-If you choose `openclaw`, dotfiles also creates `/var/tmp/openclaw-compile-cache` when possible and exports:
+If you choose `openclaw`, dotfiles also creates `/var/tmp/openclaw-compile-cache` when possible, exports:
 
 ```bash
 export NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
 export OPENCLAW_NO_RESPAWN=1
 ```
 
-Re-running `chezmoi init --apply` with `openclaw` selected applies the same config to existing installs too.
+and writes an OpenClaw gateway systemd user drop-in so the service gets the same env. When `desktop-vnc` is also selected, that drop-in adds `DISPLAY=:99` so `openclaw browser open ...` targets the VNC display too. Re-running `chezmoi init --apply` with `openclaw` selected applies the same config to existing installs too.
 
 If you choose `desktop-vnc`, dotfiles stores a VNC password, writes `~/.local/bin/dotfiles-start-vnc-display`, and enables a systemd service that runs:
 
 ```bash
-Xvfb :99 -screen 0 1920x1200x24 &
+Xvfb :99 -screen 0 "$DOTFILES_VNC_SCREEN" &
 export DISPLAY=:99
 openbox &
 x11vnc -display :99 -forever -shared -rfbauth "$HOME/.vnc/passwd" -rfbport 5900 -ncache 10 -noxdamage
 ```
 
-Openbox keeps window focus sane and avoids some Chrome glitches compared with a bare virtual display. The service starts on boot, so you can connect to `vnc://HOST:5900` at any time after the password exists.
+Openbox keeps window focus sane and avoids some Chrome glitches compared with a bare virtual display. The service starts on boot, defaults to `DOTFILES_VNC_SCREEN=1440x900x24`, and can be overridden with a systemd service override if you want a different size. You can connect to `vnc://HOST:5900` at any time after the password exists.
 
 ## New VPS Example
 
@@ -311,7 +311,7 @@ Package definitions live in `.chezmoidata/packages.toml`.
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
 - when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
-- On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache` and `OPENCLAW_NO_RESPAWN=1`; all of these extras default to off
+- On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
 - `uv` installs through the official Astral installer

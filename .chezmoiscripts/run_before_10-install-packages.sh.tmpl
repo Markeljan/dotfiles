@@ -298,6 +298,7 @@ install_vnc_desktop_packages() {
     xvfb
     x11vnc
     openbox
+    x11-xserver-utils
   )
   local -a missing=()
   local package
@@ -394,6 +395,7 @@ write_vnc_start_script() {
 set -euo pipefail
 
 export DISPLAY="${DISPLAY:-:99}"
+screen_spec="${DOTFILES_VNC_SCREEN:-1440x900x24}"
 password_file="$HOME/.vnc/passwd"
 
 if [ ! -f "$password_file" ]; then
@@ -401,8 +403,11 @@ if [ ! -f "$password_file" ]; then
   exit 1
 fi
 
-Xvfb "$DISPLAY" -screen 0 1920x1200x24 &
+Xvfb "$DISPLAY" -screen 0 "$screen_spec" +extension RANDR &
 sleep 1
+if command -v xsetroot >/dev/null 2>&1; then
+  xsetroot -display "$DISPLAY" -solid '#2f3442' || true
+fi
 openbox &
 sleep 1
 
@@ -434,6 +439,7 @@ Type=simple
 User=$USER
 Environment=HOME=$HOME
 Environment=DISPLAY=:99
+Environment=DOTFILES_VNC_SCREEN=1440x900x24
 WorkingDirectory=$HOME
 ExecStart={{ $vncStartScript }}
 Restart=always

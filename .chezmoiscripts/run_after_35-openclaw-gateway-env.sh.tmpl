@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{ $bootstrap := get . "bootstrap" | default dict }}
+{{ $installDesktopVnc := get $bootstrap "install_desktop_vnc" | default false }}
+{{ $installOpenClaw := get $bootstrap "install_openclaw" | default false }}
+
+have() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+warn() {
+  printf '[dotfiles openclaw] warning: %s\n' "$*" >&2
+}
+
+systemctl_user_available() {
+  have systemctl && systemctl --user show-environment >/dev/null 2>&1
+}
+
+list_gateway_units() {
+  {
+    printf '%s\n' "openclaw-gateway.service"
+    if systemctl_user_available; then
+      systemctl --user list-unit-files 'openclaw-gateway*.service' --no-legend 2>/dev/null | awk '{print $1}'
+    fi
+  } | awk 'NF && !seen[$0]++'
+}
+
+write_dropin() {
+  local unit_name="$1"
+  local dir_path="$HOME/.config/systemd/user/${unit_name}.d"
+  local file_path="$dir_path/10-dotfiles-env.conf"
+  local tmp_file
+
+  mkdir -p "$dir_path"
+  tmp_file="$(mktemp)"
+  cat >"$tmp_file" <<EOF
+[Service]
+Environment=NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
+Environment=OPENCLAW_NO_RESPAWN=1
+EOF
+
+  {{- if $installDesktopVnc }}
+  cat >>"$tmp_file" <<'EOF'
+Environment=DISPLAY=:99
+EOF
+  {{- end }}
+
+  mv "$tmp_file" "$file_path"
+}
+
+remove_dropin() {
+  local unit_name="$1"
+  local dir_path="$HOME/.config/systemd/user/${unit_name}.d"
+  local file_path="$dir_path/10-dotfiles-env.conf"
+
+  rm -f "$file_path"
+  rmdir "$dir_path" 2>/dev/null || true
+}
+
+restart_gateway_units() {
+  local unit_name
+
+  if ! systemctl_user_available; then
+    return
+  fi
+
+  systemctl --user daemon-reload >/dev/null 2>&1 || warn "could not reload the OpenClaw user units"
+
+  while IFS= read -r unit_name; do
+    if systemctl --user is-active "$unit_name" >/dev/null 2>&1; then
+      systemctl --user restart "$unit_name" >/dev/null 2>&1 || warn "could not restart $unit_name"
+    fi
+  done < <(list_gateway_units)
+}
+
+main() {
+  local unit_name
+
+  while IFS= read -r unit_name; do
+    {{- if $installOpenClaw }}
+    write_dropin "$unit_name"
+    {{- else }}
+    remove_dropin "$unit_name"
+    {{- end }}
+  done < <(list_gateway_units)
+
+  restart_gateway_units
+}
+
+main "$@"
