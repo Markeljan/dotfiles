@@ -269,13 +269,13 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
 - optional `zoxide` and `starship` initialization
 - shared functions: `mkcd`, `gc`
-- bun shortcuts: `b`, `bi`, `br`, `bx`
+- bun shortcuts: `b`, `bi`, `bx`, `brd`, `brb`, `brs`, `brt`, `brl`, `brf`, `brc`
 - shell shortcuts: `cat`, `grep`, `mkdir`, `cd`
 - `eza` shortcuts: `l`, `la`, `ll`, `lt`
 - git shortcuts: `ga`, `gd`, `gl`, `gp`, `gs`, `gfl`
 - system shortcut: `sys`
 - `procs` default: `procs --pager disable --sorta mem`
-- pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`
+- pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`, `prc`
 - Claude/Codex shortcuts: `dclaude`, `dcodex`
 
 fish uses `abbr` for shared aliases. bash and zsh use aliases. Shared functions are defined separately.

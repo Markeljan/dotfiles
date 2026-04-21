@@ -18,12 +18,36 @@ name = "bi"
 expansion = "bun install"
 
 [[shell.aliases]]
-name = "br"
-expansion = "bun run"
+name = "bx"
+expansion = "bunx"
 
 [[shell.aliases]]
-name = "bx"
-expansion = "bun x"
+name = "brd"
+expansion = "bun run dev"
+
+[[shell.aliases]]
+name = "brb"
+expansion = "bun run build"
+
+[[shell.aliases]]
+name = "brs"
+expansion = "bun run start"
+
+[[shell.aliases]]
+name = "brt"
+expansion = "bun run test"
+
+[[shell.aliases]]
+name = "brl"
+expansion = "bun run lint"
+
+[[shell.aliases]]
+name = "brf"
+expansion = "bun run format"
+
+[[shell.aliases]]
+name = "brc"
+expansion = "bun run check"
 
 [[shell.aliases]]
 name = "cat"
@@ -120,6 +144,10 @@ expansion = "pnpm run lint"
 [[shell.aliases]]
 name = "prf"
 expansion = "pnpm run format"
+
+[[shell.aliases]]
+name = "prc"
+expansion = "pnpm run check"
 
 [[shell.aliases]]
 name = "dclaude"
