@@ -280,7 +280,7 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 
 fish uses `abbr` for shared aliases. bash and zsh use aliases. Shared functions are defined separately.
 
-`rmrf` stages removal by renaming the target to a hidden sibling and deleting it in the background. It refuses empty paths, `.`, `..`, `~`, `/`, and the resolved home directory, and it does not follow the final symlink component when removing a link.
+`rmrf` stages removal by renaming the target to a hidden sibling and deleting it in the background. It refuses empty paths, `.`, `..`, `~`, `/`, and the resolved home directory, and it does not follow the final symlink component when removing a link. If a real directory cannot be renamed in place, it falls back to clearing that directory's contents asynchronously while keeping the directory itself.
 
 `fzf` is configured with a right-hand 50% preview split and `~/.local/bin/fzf-preview`.
 

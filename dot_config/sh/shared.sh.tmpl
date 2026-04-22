@@ -210,13 +210,50 @@ dotfiles_rmrf_target_path() {
   fi
 }
 
+dotfiles_rmrf_stage_directory_contents() {
+  if [ "$#" -ne 2 ]; then
+    return 1
+  fi
+
+  local target timestamp attempt trash trash_base
+
+  target="$1"
+  timestamp="$2"
+
+  if [ ! -d "$target" ] || [ -L "$target" ]; then
+    return 1
+  fi
+
+  attempt=0
+  while :; do
+    attempt=$((attempt + 1))
+    trash="$target/.rmrf-contents.__trash__.$timestamp.$$.${attempt}"
+    if [ ! -e "$trash" ]; then
+      break
+    fi
+  done
+
+  if ! command mkdir -- "$trash"; then
+    return 1
+  fi
+
+  trash_base="${trash##*/}"
+  if ! command find "$target" -mindepth 1 -maxdepth 1 ! -name "$trash_base" -exec mv -- {} "$trash"/ \;; then
+    command rmdir -- "$trash" >/dev/null 2>&1 || true
+    return 1
+  fi
+
+  command rm -rf -- "$trash" >/dev/null 2>&1 &
+  return 0
+}
+
 rmrf() {
   if [ "$#" -eq 0 ]; then
     printf 'rmrf: missing path\n' >&2
     return 1
   fi
 
-  local input expanded target timestamp trash attempt
+  local input expanded target timestamp trash attempt mv_output mv_status
 
   for input in "$@"; do
     if [ -z "$input" ]; then
@@ -269,7 +306,16 @@ rmrf() {
       fi
     done
 
-    if ! command mv -- "$target" "$trash"; then
+    mv_output="$(command mv -- "$target" "$trash" 2>&1)"
+    mv_status=$?
+    if [ "$mv_status" -ne 0 ]; then
+      if dotfiles_rmrf_stage_directory_contents "$target" "$timestamp"; then
+        printf 'rmrf: cleared contents of %s (async); kept directory after rename failed\n' "$target"
+        continue
+      fi
+      if [ -n "$mv_output" ]; then
+        printf '%s\n' "$mv_output" >&2
+      fi
       printf 'rmrf: failed to stage path for deletion: %s\n' "$target" >&2
       continue
     fi

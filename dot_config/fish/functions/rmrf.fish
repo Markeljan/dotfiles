@@ -77,7 +77,34 @@ function rmrf --description "fast remove (rename + async delete with guardrails)
             end
         end
 
-        if not command mv -- "$target" "$trash"
+        set -l mv_output (command mv -- "$target" "$trash" 2>&1)
+        set -l mv_status $status
+        if test $mv_status -ne 0
+            if test -d "$target"; and not test -L "$target"
+                set -l content_attempt 0
+                set -l content_trash
+                while true
+                    set content_attempt (math "$content_attempt + 1")
+                    set content_trash "$target/.rmrf-contents.__trash__.$timestamp.$fish_pid.$content_attempt"
+                    if not test -e "$content_trash"
+                        break
+                    end
+                end
+
+                if command mkdir -- "$content_trash"
+                    set -l content_trash_base (path basename -- "$content_trash")
+                    if command find "$target" -mindepth 1 -maxdepth 1 ! -name "$content_trash_base" -exec mv -- '{}' "$content_trash"/ \;
+                        command rm -rf -- "$content_trash" >/dev/null 2>&1 &
+                        printf 'rmrf: cleared contents of %s (async); kept directory after rename failed\n' "$target"
+                        continue
+                    end
+                    command rmdir -- "$content_trash" >/dev/null 2>&1
+                end
+            end
+
+            if test (count $mv_output) -gt 0
+                printf '%s\n' $mv_output >&2
+            end
             printf 'rmrf: failed to stage path for deletion: %s\n' "$target" >&2
             continue
         end
