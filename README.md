@@ -229,6 +229,7 @@ This repo stays intentionally small:
 - `~/.config/sh/shared.sh`
 - `~/.config/fish/conf.d/*.fish`
 - `~/.config/fish/functions/mkcd.fish`
+- `~/.config/fish/functions/rmrf.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
 - `~/.ssh/authorized_keys.shared`
@@ -268,7 +269,7 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional `fnm` initialization with Node.js LTS via `fnm`
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
 - optional `zoxide` and `starship` initialization
-- shared functions: `mkcd`, `gc`
+- shared functions: `mkcd`, `gc`, `rmrf`
 - bun shortcuts: `b`, `bi`, `bx`, `brd`, `brb`, `brs`, `brt`, `brl`, `brf`, `brc`
 - shell shortcuts: `cat`, `grep`, `mkdir`, `cd`
 - `eza` shortcuts: `l`, `la`, `ll`, `lt`
@@ -279,6 +280,8 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - Claude/Codex shortcuts: `dclaude`, `dcodex`
 
 fish uses `abbr` for shared aliases. bash and zsh use aliases. Shared functions are defined separately.
+
+`rmrf` stages removal by renaming the target to a hidden sibling and deleting it in the background. It refuses empty paths, `.`, `..`, `~`, `/`, and the resolved home directory, and it does not follow the final symlink component when removing a link.
 
 `fzf` is configured with a right-hand 50% preview split and `~/.local/bin/fzf-preview`.
 

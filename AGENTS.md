@@ -27,6 +27,7 @@ Maintainers may also point chezmoi at an explicit local checkout with `chezmoi i
 - `~/.config/sh/shared.sh`
 - `~/.config/fish/conf.d/*.fish`
 - `~/.config/fish/functions/mkcd.fish`
+- `~/.config/fish/functions/rmrf.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
 - `~/.ssh/authorized_keys.shared`

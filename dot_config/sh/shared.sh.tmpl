@@ -155,6 +155,130 @@ mkcd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
 
+dotfiles_rmrf_target_path() {
+  if [ "$#" -ne 1 ]; then
+    return 1
+  fi
+
+  local input expanded trimmed parent base parent_abs
+
+  input="$1"
+
+  case "$input" in
+    "~")
+      expanded="$HOME"
+      ;;
+    "~/"*)
+      expanded="$HOME/${input#~/}"
+      ;;
+    *)
+      expanded="$input"
+      ;;
+  esac
+
+  if [ ! -e "$expanded" ]; then
+    return 1
+  fi
+
+  trimmed="$expanded"
+  while [ "$trimmed" != "/" ] && [ "${trimmed%/}" != "$trimmed" ]; do
+    trimmed="${trimmed%/}"
+  done
+
+  if [ "$trimmed" = "/" ]; then
+    printf '/\n'
+    return 0
+  fi
+
+  base="${trimmed##*/}"
+  parent="${trimmed%/*}"
+
+  if [ "$parent" = "$trimmed" ]; then
+    parent="."
+  elif [ -z "$parent" ]; then
+    parent="/"
+  fi
+
+  parent_abs="$(
+    cd -- "$parent" 2>/dev/null && pwd -P
+  )" || return 1
+
+  if [ "$parent_abs" = "/" ]; then
+    printf '/%s\n' "$base"
+  else
+    printf '%s/%s\n' "$parent_abs" "$base"
+  fi
+}
+
+rmrf() {
+  if [ "$#" -eq 0 ]; then
+    printf 'rmrf: missing path\n' >&2
+    return 1
+  fi
+
+  local input expanded target timestamp trash attempt
+
+  for input in "$@"; do
+    if [ -z "$input" ]; then
+      printf 'rmrf: refusing empty path\n' >&2
+      continue
+    fi
+
+    case "$input" in
+      /|.|..|~|~/)
+        printf 'rmrf: refusing dangerous path: %s\n' "$input" >&2
+        continue
+        ;;
+    esac
+
+    case "$input" in
+      "~")
+        expanded="$HOME"
+        ;;
+      "~/"*)
+        expanded="$HOME/${input#~/}"
+        ;;
+      *)
+        expanded="$input"
+        ;;
+    esac
+
+    if [ ! -e "$expanded" ]; then
+      printf 'rmrf: not found: %s\n' "$input" >&2
+      continue
+    fi
+
+    target="$(dotfiles_rmrf_target_path "$input")"
+    if [ -z "$target" ]; then
+      printf 'rmrf: could not resolve path: %s\n' "$input" >&2
+      continue
+    fi
+
+    if [ "$target" = "/" ] || [ "$target" = "$HOME" ]; then
+      printf 'rmrf: refusing protected path: %s\n' "$target" >&2
+      continue
+    fi
+
+    timestamp="$(date +%s 2>/dev/null || printf '0\n')"
+    attempt=0
+    while :; do
+      attempt=$((attempt + 1))
+      trash="$target.__trash__.$timestamp.$$.${attempt}"
+      if [ ! -e "$trash" ]; then
+        break
+      fi
+    done
+
+    if ! command mv -- "$target" "$trash"; then
+      printf 'rmrf: failed to stage path for deletion: %s\n' "$target" >&2
+      continue
+    fi
+
+    command rm -rf -- "$trash" >/dev/null 2>&1 &
+    printf 'rmrf: removed %s (async)\n' "$target"
+  done
+}
+
 gc() {
   local message
 
