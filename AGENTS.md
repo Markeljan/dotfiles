@@ -30,7 +30,6 @@ Maintainers may also point chezmoi at an explicit local checkout with `chezmoi i
 - `~/.config/fish/functions/rmrf.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
-- `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config` on macOS only
@@ -53,7 +52,7 @@ On interactive Linux bootstraps, package bootstrap can also opt into a `desktop-
 - Do not store secrets in the repo.
 - Keep machine-specific aliases, SSH hosts, and extra keys in local override files.
 - Do not seed host aliases or existing `authorized_keys` entries from the current machine into the repo.
-- Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file, keep repo-wide keys in `~/.ssh/authorized_keys.shared`, and keep machine-specific additions in `~/.ssh/authorized_keys.local`.
+- Preserve any existing `~/.ssh/authorized_keys` entries when regenerating the managed file, keep the repo-wide public key appended automatically, and keep machine-specific additions in `~/.ssh/authorized_keys.local`.
 - Preserve existing top-level shell rc files and SSH config when include hooks or create-only files are sufficient.
 - Keep `fish` as the intended login shell and do not auto-attach or repo-manage `tmux`.
 - Do not reintroduce a separate installer wrapper when chezmoi can express the workflow directly.
@@ -74,8 +73,9 @@ printf '# local machine change\n' >>"$tmp_home/.config/fish/config.fish"
 HOME="$tmp_home" DOTFILES_SKIP_PACKAGES=1 DOTFILES_SKIP_LOGIN_SHELL=1 chezmoi apply --force --source "$PWD" --destination "$tmp_home"
 grep -Fq '# local machine change' "$tmp_home/.config/fish/config.fish"
 HOME="$tmp_home" nvim --headless "+qa" || true
-test -f "$tmp_home/.ssh/authorized_keys.shared"
 test -f "$tmp_home/.ssh/authorized_keys"
+grep -Fq 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILwXOaRFvzRwWE6lRt4DMK26VSR4e2b2hWQ7IEfi09Xa' "$tmp_home/.ssh/authorized_keys"
+test ! -e "$tmp_home/.ssh/authorized_keys.shared"
 test ! -e "$tmp_home/.ssh/config.shared"
 test ! -e "$tmp_home/bin"
 test ! -e "$tmp_home/.config/nvim/init.vim"

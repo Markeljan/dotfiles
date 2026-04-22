@@ -215,7 +215,7 @@ This repo stays intentionally small:
 - shell completions for common installed tools in bash, zsh, and fish
 - `tmux` installed without repo-managed auto-attach or custom config
 - local SSH top-level config passthrough with `config.local`
-- append-safe `authorized_keys` generation from shared and local files
+- append-safe `authorized_keys` generation from the repo key and local file
 - minimal Neovim with a left file tree and editor pane
 - package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
@@ -232,7 +232,6 @@ This repo stays intentionally small:
 - `~/.config/fish/functions/rmrf.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
-- `~/.ssh/authorized_keys.shared`
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config`
@@ -271,7 +270,7 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional `zoxide` and `starship` initialization
 - shared functions: `mkcd`, `gc`, `rmrf`
 - bun shortcuts: `b`, `bi`, `bx`, `brd`, `brb`, `brs`, `brt`, `brl`, `brf`, `brc`
-- shell shortcuts: `cat`, `grep`, `mkdir`, `cd`
+- shell shortcuts: `cat`, `grep`, `mkdir`, `cd`, `rsy`
 - `eza` shortcuts: `l`, `la`, `ll`, `lt`
 - git shortcuts: `ga`, `gd`, `gl`, `gp`, `gs`, `gfl`
 - system shortcut: `sys`
@@ -299,7 +298,7 @@ On machines with no existing `~/.ssh/config`, the post-apply hook creates a mini
 `authorized_keys` is generated on every `chezmoi apply` from:
 
 - the existing `~/.ssh/authorized_keys` file
-- shared base: repo-managed `~/.ssh/authorized_keys.shared`
+- the repo-managed shared public key embedded in the post-apply hook
 - optional local append file: `~/.ssh/authorized_keys.local`
 
 Entries are merged and de-duplicated, so existing keys are preserved rather than overwritten.

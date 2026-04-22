@@ -150,6 +150,10 @@ name = "prc"
 expansion = "pnpm run check"
 
 [[shell.aliases]]
+name = "rsy"
+expansion = "rsync -avh --progress"
+
+[[shell.aliases]]
 name = "dclaude"
 expansion = "claude --dangerously-skip-permissions"
 

