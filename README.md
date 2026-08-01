@@ -320,6 +320,7 @@ Baseline package definitions live in `.chezmoidata/packages.toml`. The package s
 - On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw via `bun install --global openclaw@2026.4.12` and `bun pm --global trust --all`, with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off
 - `fnm` installs through Homebrew
 - Node.js LTS installs through `fnm`
+- `pnpm` and `pnpx` are enabled through Corepack after Node.js LTS is active
 - `uv` installs through the official Astral installer
 - `bun` installs through the official Bun installer
 - `neovim` installs through the system package manager

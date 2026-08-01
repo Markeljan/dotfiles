@@ -243,6 +243,21 @@ install_node_lts() {
   fnm default "$(fnm current)" >/dev/null 2>&1
 }
 
+install_pnpm() {
+  if have pnpm && have pnpx; then
+    return
+  fi
+
+  if ! have corepack; then
+    warn "Corepack is required to enable pnpm"
+    return 1
+  fi
+
+  log "enabling pnpm through Corepack"
+  corepack enable pnpm
+  corepack install --global pnpm@latest
+}
+
 detect_linux_id() {
   if [ ! -r /etc/os-release ]; then
     warn "missing /etc/os-release"
@@ -780,6 +795,7 @@ main() {
   install_fnm
   install_linux_brew_packages
   install_node_lts
+  install_pnpm
   ensure_fd_symlink
   install_uv_tools
   install_bun_packages

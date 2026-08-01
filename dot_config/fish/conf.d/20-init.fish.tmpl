@@ -37,6 +37,6 @@ end
 
 if status is-interactive
     if command -q bun
-        bun completions 2>/dev/null | source
+        env SHELL=fish bun completions 2>/dev/null | source
     end
 end
