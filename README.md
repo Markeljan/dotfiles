@@ -243,7 +243,7 @@ On macOS, dotfiles also manages:
 - `~/Library/Application Support/Cursor/User/settings.json`
 - `~/Library/Application Support/Cursor/User/keybindings.json`
 
-The Cursor files are based on the active `cursor-01-2026` profile but are applied as the portable default profile on a new machine. Generated profile IDs, editor history, workspace state, authentication, remote-host mappings, and absolute machine paths are intentionally excluded. When Cursor is already installed, a post-apply hook installs missing extension IDs from `.chezmoidata/editors.toml`; extension versions are not pinned so a fresh machine receives compatible current releases. Set `DOTFILES_SKIP_PACKAGES=1` to skip extension installation along with the rest of package bootstrap during tests.
+The Cursor files are based on the active `cursor-01-2026` profile and are applied as the portable Default-profile configuration. After apply, the same settings and keybindings are copied into every existing named Cursor profile, so existing workspace/profile associations continue to work with the shared configuration. Generated profile IDs, editor history, workspace state, authentication, remote-host mappings, and absolute machine paths are intentionally excluded. When Cursor is already installed, a post-apply hook installs missing extension IDs from `.chezmoidata/editors.toml`; extension versions are not pinned so a fresh machine receives compatible current releases. Set `DOTFILES_SKIP_PACKAGES=1` to skip extension installation along with the rest of package bootstrap during tests.
 
 On macOS, dotfiles also manages app CLI helper symlinks in `~/.local/bin` when the matching app bundle already exists:
 
