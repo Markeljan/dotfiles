@@ -104,7 +104,7 @@ What happens:
 - chezmoi clones the repo into its source directory
 - the package script installs the baseline packages with APT and Homebrew formulae, installs `claude-code@latest` and `codex` with Homebrew when `claude` or `codex` are missing, and then installs `fnm`, Node.js LTS, `uv`, and `bun`
 - on macOS, app-provided CLI helpers are linked into `~/.local/bin` only when the matching app bundle is already installed
-- on macOS, portable Cursor and VS Code settings are applied and missing extensions from the shared lists are installed when the matching app bundle is already installed
+- on macOS, portable Cursor settings are applied and missing extensions from the shared list are installed when Cursor is already installed
 - your shell, SSH, Neovim, and prompt config are applied
 - dotfiles tries to set `fish` as the login shell
 
@@ -220,7 +220,7 @@ This repo stays intentionally small:
 - minimal Neovim with a left file tree and editor pane
 - package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
-- Cursor and VS Code user settings/keybindings, VS Code tasks, and editor extension lists on macOS
+- Cursor user settings, keybindings, and extensions on macOS
 
 ## Managed files
 
@@ -242,17 +242,13 @@ On macOS, dotfiles also manages:
 
 - `~/Library/Application Support/Cursor/User/settings.json`
 - `~/Library/Application Support/Cursor/User/keybindings.json`
-- `~/Library/Application Support/Code/User/settings.json`
-- `~/Library/Application Support/Code/User/keybindings.json`
-- `~/Library/Application Support/Code/User/tasks.json`
 
-The Cursor files are based on the active `cursor-01-2026` profile but are applied as the portable default profile on a new machine. Generated profile IDs, editor history, workspace state, authentication, remote-host mappings, and absolute machine paths are intentionally excluded. When Cursor or VS Code is already installed, a post-apply hook installs missing extension IDs from `.chezmoidata/editors.toml`; extension versions are not pinned so a fresh machine receives compatible current releases. Set `DOTFILES_SKIP_PACKAGES=1` to skip extension installation along with the rest of package bootstrap during tests.
+The Cursor files are based on the active `cursor-01-2026` profile but are applied as the portable default profile on a new machine. Generated profile IDs, editor history, workspace state, authentication, remote-host mappings, and absolute machine paths are intentionally excluded. When Cursor is already installed, a post-apply hook installs missing extension IDs from `.chezmoidata/editors.toml`; extension versions are not pinned so a fresh machine receives compatible current releases. Set `DOTFILES_SKIP_PACKAGES=1` to skip extension installation along with the rest of package bootstrap during tests.
 
 On macOS, dotfiles also manages app CLI helper symlinks in `~/.local/bin` when the matching app bundle already exists:
 
 - `~/.local/bin/cursor`
 - `~/.local/bin/cursor-tunnel`
-- `~/.local/bin/code`
 - `~/.local/bin/github`
 
 On macOS, chezmoi also creates a symlink from:
@@ -325,9 +321,9 @@ Baseline package definitions live in `.chezmoidata/packages.toml`. The package s
 - Debian and Ubuntu use APT for baseline packages and Homebrew for `bat`, `eza`, `fastfetch`, `procs`, `claude-code@latest`, `codex`, and `fnm`
 - Debian and Ubuntu install the Homebrew prerequisites from the official Homebrew docs
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
-- macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
+- macOS installs the `gh` CLI, but does not install Cursor or GitHub Desktop
 - On macOS and Linux, dotfiles installs `claude-code@latest` when `claude` is missing and `codex` when `codex` is missing
-- when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
+- when `Cursor.app` or `GitHub Desktop.app` already exists in `/Applications` or `~/Applications`, dotfiles links its CLI helpers into `~/.local/bin`
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
 - On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw via `bun install --global openclaw@2026.4.12` and `bun pm --global trust --all`, with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off
 - `fnm` installs through Homebrew

@@ -45,12 +45,6 @@ cursor_extensions=(
 {{- end }}
 )
 
-vscode_extensions=(
-{{- range .editors.vscode_extensions }}
-  "{{ . }}"
-{{- end }}
-)
-
 cursor_cli=""
 for candidate in \
   "/Applications/Cursor.app/Contents/Resources/app/bin/cursor" \
@@ -63,21 +57,7 @@ for candidate in \
   fi
 done
 
-vscode_cli=""
-for candidate in \
-  "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" \
-  "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"; do
-  if [ -x "$candidate" ]; then
-    vscode_cli="$candidate"
-    break
-  fi
-done
-
 if [ -n "$cursor_cli" ]; then
   install_extensions "Cursor" "$cursor_cli" "${cursor_extensions[@]}"
-fi
-
-if [ -n "$vscode_cli" ]; then
-  install_extensions "VS Code" "$vscode_cli" "${vscode_extensions[@]}"
 fi
 {{ end -}}
