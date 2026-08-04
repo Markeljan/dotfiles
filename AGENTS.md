@@ -33,6 +33,8 @@ Maintainers may also point chezmoi at an explicit local checkout with `chezmoi i
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config` on macOS only
+- `~/Library/Application Support/Cursor/User/settings.json` and `keybindings.json` on macOS only
+- `~/Library/Application Support/Code/User/settings.json`, `keybindings.json`, and `tasks.json` on macOS only
 - `~/.local/bin/cursor`, `~/.local/bin/cursor-tunnel`, `~/.local/bin/code`, and `~/.local/bin/github` on macOS only when the matching app bundle is already installed
 
 Top-level shell files are created when missing. `~/.ssh/config` is created by a post-apply hook when missing. If they already exist, they are preserved and may receive a small source/include hook instead of being replaced.
@@ -42,6 +44,7 @@ Top-level shell files are created when missing. `~/.ssh/config` is created by a 
 On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked to `~/.config/ghostty/config`.
 
 Package bootstrap installs `claude-code@latest` and `codex` with Homebrew when `claude` or `codex` are missing, installs Node.js LTS through `fnm`, and enables `pnpm` and `pnpx` through Corepack. It does not install Cursor, Visual Studio Code, or GitHub Desktop. On macOS, dotfiles only links their CLI helpers into `~/.local/bin` when the matching app bundle already exists in `/Applications` or `~/Applications`.
+On macOS, portable Cursor and VS Code user configuration is applied independently of app installation. A post-apply hook installs missing extension IDs from `.chezmoidata/editors.toml` when the matching app exists; `DOTFILES_SKIP_PACKAGES=1` skips this hook. Generated profile metadata, application state, credentials, history, remote-host mappings, and absolute machine paths are not managed.
 On interactive Linux bootstraps, package bootstrap can also opt into a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, or a `desktop-rdp` bundle with XFCE desktop packages, `xrdp`, and Google Chrome on `amd64`. Re-running `chezmoi init --apply` reconciles those services: selected ones are enabled and started, deselected ones are disabled and stopped. The VNC path tries to run `x11vnc -storepasswd` when an interactive TTY is available, exports `DISPLAY=:99` through the shared shell config, and defaults the virtual screen size to `1440x900x24`. The optional OpenClaw path installs `openclaw@2026.4.12` with `bun install --global`, runs `bun pm --global trust --all`, also creates `/var/tmp/openclaw-compile-cache` when possible, exports `NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache` plus `OPENCLAW_NO_RESPAWN=1`, and manages an OpenClaw gateway systemd user drop-in that adds those env vars and `DISPLAY=:99` when `desktop-vnc` is selected, including on reruns for existing installs.
 
 ## Constraints

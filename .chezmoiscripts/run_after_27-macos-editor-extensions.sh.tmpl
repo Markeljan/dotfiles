@@ -1,0 +1,83 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "${DOTFILES_SKIP_PACKAGES:-0}" = "1" ]; then
+  exit 0
+fi
+
+log() {
+  printf '[dotfiles editors] %s\n' "$*"
+}
+
+warn() {
+  printf '[dotfiles editors] warning: %s\n' "$*" >&2
+}
+
+install_extensions() {
+  local editor_name="$1"
+  local cli_path="$2"
+  shift 2
+
+  if [ ! -x "$cli_path" ]; then
+    return 0
+  fi
+
+  local installed_extensions
+  installed_extensions="$("$cli_path" --list-extensions 2>/dev/null | tr '[:upper:]' '[:lower:]' || true)"
+
+  local extension
+  for extension in "$@"; do
+    if printf '%s\n' "$installed_extensions" | grep -Fqx "$extension"; then
+      continue
+    fi
+
+    log "installing $editor_name extension $extension"
+    if ! "$cli_path" --install-extension "$extension"; then
+      warn "could not install $editor_name extension $extension"
+    fi
+  done
+}
+
+cursor_extensions=(
+{{- range .editors.cursor_extensions }}
+  "{{ . }}"
+{{- end }}
+)
+
+vscode_extensions=(
+{{- range .editors.vscode_extensions }}
+  "{{ . }}"
+{{- end }}
+)
+
+cursor_cli=""
+for candidate in \
+  "/Applications/Cursor.app/Contents/Resources/app/bin/cursor" \
+  "/Applications/Cursor.app/Contents/Resources/app/bin/code" \
+  "$HOME/Applications/Cursor.app/Contents/Resources/app/bin/cursor" \
+  "$HOME/Applications/Cursor.app/Contents/Resources/app/bin/code"; do
+  if [ -x "$candidate" ]; then
+    cursor_cli="$candidate"
+    break
+  fi
+done
+
+vscode_cli=""
+for candidate in \
+  "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" \
+  "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"; do
+  if [ -x "$candidate" ]; then
+    vscode_cli="$candidate"
+    break
+  fi
+done
+
+if [ -n "$cursor_cli" ]; then
+  install_extensions "Cursor" "$cursor_cli" "${cursor_extensions[@]}"
+fi
+
+if [ -n "$vscode_cli" ]; then
+  install_extensions "VS Code" "$vscode_cli" "${vscode_extensions[@]}"
+fi
+{{ end -}}

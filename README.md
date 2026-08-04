@@ -104,6 +104,7 @@ What happens:
 - chezmoi clones the repo into its source directory
 - the package script installs the baseline packages with APT and Homebrew formulae, installs `claude-code@latest` and `codex` with Homebrew when `claude` or `codex` are missing, and then installs `fnm`, Node.js LTS, `uv`, and `bun`
 - on macOS, app-provided CLI helpers are linked into `~/.local/bin` only when the matching app bundle is already installed
+- on macOS, portable Cursor and VS Code settings are applied and missing extensions from the shared lists are installed when the matching app bundle is already installed
 - your shell, SSH, Neovim, and prompt config are applied
 - dotfiles tries to set `fish` as the login shell
 
@@ -219,6 +220,7 @@ This repo stays intentionally small:
 - minimal Neovim with a left file tree and editor pane
 - package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
+- Cursor and VS Code user settings/keybindings, VS Code tasks, and editor extension lists on macOS
 
 ## Managed files
 
@@ -235,6 +237,16 @@ This repo stays intentionally small:
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config`
+
+On macOS, dotfiles also manages:
+
+- `~/Library/Application Support/Cursor/User/settings.json`
+- `~/Library/Application Support/Cursor/User/keybindings.json`
+- `~/Library/Application Support/Code/User/settings.json`
+- `~/Library/Application Support/Code/User/keybindings.json`
+- `~/Library/Application Support/Code/User/tasks.json`
+
+The Cursor files are based on the active `cursor-01-2026` profile but are applied as the portable default profile on a new machine. Generated profile IDs, editor history, workspace state, authentication, remote-host mappings, and absolute machine paths are intentionally excluded. When Cursor or VS Code is already installed, a post-apply hook installs missing extension IDs from `.chezmoidata/editors.toml`; extension versions are not pinned so a fresh machine receives compatible current releases. Set `DOTFILES_SKIP_PACKAGES=1` to skip extension installation along with the rest of package bootstrap during tests.
 
 On macOS, dotfiles also manages app CLI helper symlinks in `~/.local/bin` when the matching app bundle already exists:
 
