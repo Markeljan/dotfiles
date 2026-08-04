@@ -1,0 +1,32 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+cursor_user_dir="$HOME/Library/Application Support/Cursor/User"
+profiles_dir="$cursor_user_dir/profiles"
+
+if [ ! -d "$profiles_dir" ]; then
+  exit 0
+fi
+
+sync_profile_file() {
+  local source_path="$1"
+  local target_path="$2"
+
+  if [ ! -f "$source_path" ] || cmp -s "$source_path" "$target_path"; then
+    return 0
+  fi
+
+  install -m 0644 "$source_path" "$target_path"
+  printf '[dotfiles cursor] synced %s\n' "$target_path"
+}
+
+for profile_dir in "$profiles_dir"/*; do
+  if [ ! -d "$profile_dir" ]; then
+    continue
+  fi
+
+  sync_profile_file "$cursor_user_dir/settings.json" "$profile_dir/settings.json"
+  sync_profile_file "$cursor_user_dir/keybindings.json" "$profile_dir/keybindings.json"
+done
+{{ end -}}
