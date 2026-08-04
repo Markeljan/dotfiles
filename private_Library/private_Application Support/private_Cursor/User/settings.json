@@ -183,6 +183,7 @@
 	"terminal.integrated.shellIntegration.showCommandGuide": false,
 	"cursor.general.glassShowWarningNotifications": true,
 	"cursor.composer.shouldChimeAfterChatFinishes": true,
+	"window.newWindowProfile": "Default",
 	"window.autoDetectColorScheme": false,
 	"terminal.integrated.enableKittyKeyboardProtocol": false
 }
