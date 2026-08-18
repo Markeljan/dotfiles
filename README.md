@@ -219,6 +219,7 @@ This repo stays intentionally small:
 - minimal Neovim with a left file tree and editor pane
 - package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
 - minimal Ghostty config on macOS only
+- Cursor user settings and keybindings on macOS only
 
 ## Managed files
 
@@ -235,12 +236,14 @@ This repo stays intentionally small:
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config`
+- `~/Library/Application Support/Cursor/User/settings.json` (macOS only)
+- `~/Library/Application Support/Cursor/User/keybindings.json` (macOS only)
 
 On macOS, dotfiles also manages app CLI helper symlinks in `~/.local/bin` when the matching app bundle already exists:
 
 - `~/.local/bin/cursor`
 - `~/.local/bin/cursor-tunnel`
-- `~/.local/bin/code`
+- `~/.local/bin/code` (points at Cursor's bundled CLI, not Visual Studio Code)
 - `~/.local/bin/github`
 
 On macOS, chezmoi also creates a symlink from:
@@ -315,7 +318,8 @@ Baseline package definitions live in `.chezmoidata/packages.toml`. The package s
 - Bash completion support installs through `bash-completion@2` on macOS and `bash-completion` on Debian/Ubuntu
 - macOS installs the `gh` CLI, but does not install Cursor, Visual Studio Code, or GitHub Desktop
 - On macOS and Linux, dotfiles installs `claude-code@latest` when `claude` is missing and `codex` when `codex` is missing
-- when `Cursor.app`, `Visual Studio Code.app`, or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
+- when `Cursor.app` or `GitHub Desktop.app` already exist in `/Applications` or `~/Applications`, dotfiles links their CLI helpers into `~/.local/bin`
+- `code` is linked to Cursor's own `bin/code`, so `code` opens Cursor; Visual Studio Code is not used
 - On Debian and Ubuntu, `starship` installs from APT when available; otherwise dotfiles downloads the matching GitHub release tarball directly
 - On interactive Linux bootstraps, dotfiles can optionally install a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, a `desktop-rdp` bundle with XFCE, `xrdp`, and Google Chrome on `amd64`, plus OpenClaw via `bun install --global openclaw@2026.4.12` and `bun pm --global trust --all`, with `/var/tmp/openclaw-compile-cache`, `OPENCLAW_NO_RESPAWN=1`, and a managed OpenClaw gateway systemd user drop-in; all of these extras default to off
 - `fnm` installs through Homebrew

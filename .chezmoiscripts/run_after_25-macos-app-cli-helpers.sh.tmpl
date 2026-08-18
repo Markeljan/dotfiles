@@ -78,7 +78,8 @@ main() {
 
   sync_helper "cursor" "Cursor" "Contents/Resources/app/bin/cursor"
   sync_helper "cursor-tunnel" "Cursor" "Contents/Resources/app/bin/cursor-tunnel"
-  sync_helper "code" "Visual Studio Code" "Contents/Resources/app/bin/code"
+  # No VS Code on this machine: `code` should launch Cursor instead.
+  sync_helper "code" "Cursor" "Contents/Resources/app/bin/code"
   sync_helper "github" "GitHub Desktop" "Contents/Resources/app/static/github.sh"
 }
 
