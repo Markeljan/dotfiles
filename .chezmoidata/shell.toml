@@ -71,7 +71,7 @@ expansion = "git fetch && git pull"
 
 [[shell.aliases]]
 name = "gl"
-expansion = "git log --oneline --graph --decorate"
+expansion = "git log --graph --decorate --pretty=format:\"%C(auto)%h%d%C(reset) %s %C(dim)(%ar, %an)%C(reset)\""
 
 [[shell.aliases]]
 name = "gp"
