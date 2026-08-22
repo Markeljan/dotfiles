@@ -163,7 +163,7 @@
 	"cursor.composer.usageSummaryDisplay": "always",
 	"cursor.cpp.disabledLanguages": [],
 	"terminal.integrated.shellIntegration.environmentReporting": true,
-	"git.terminalGitEditor": true,
+	"git.terminalGitEditor": false,
 	"workbench.editor.enablePreview": false,
 	"workbench.tree.indent": 12,
 	"workbench.view.showQuietly": {
