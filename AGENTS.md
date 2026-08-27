@@ -30,9 +30,13 @@ Maintainers may also point chezmoi at an explicit local checkout with `chezmoi i
 - `~/.config/fish/functions/rmrf.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
+- `~/.hushlogin` (empty; suppresses login banners in terminal sessions)
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
 - `~/.config/ghostty/config` on macOS only
+- `~/.config/ghostty/backgrounds/tahoe-day.jpg` on macOS only
+- `~/.config/cmux/cmux.json` on macOS only
+- `~/Library/Application Support/com.cmuxterm.app/config.ghostty` on macOS only (linked to the primary Ghostty config)
 - `~/Library/Application Support/Cursor/User/settings.json` and `~/Library/Application Support/Cursor/User/keybindings.json` on macOS only
 - `~/Library/Application Support/Kiro/User/settings.json` on macOS only
 - `~/.local/bin/cursor`, `~/.local/bin/cursor-tunnel`, `~/.local/bin/code`, and `~/.local/bin/github` on macOS only when the matching app bundle is already installed
@@ -41,7 +45,7 @@ Top-level shell files are created when missing. `~/.ssh/config` is created by a 
 
 `~/.config/fish/config.fish` is create-only. Shared fish behavior belongs in `~/.config/fish/conf.d/*.fish`, while machine-specific edits can live in `~/.config/fish/config.fish` or `~/.config/fish/conf.d/99-local.fish`.
 
-On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` is linked to `~/.config/ghostty/config`.
+On macOS, `~/Library/Application Support/com.mitchellh.ghostty/config` and `~/Library/Application Support/com.cmuxterm.app/config.ghostty` are linked to `~/.config/ghostty/config`.
 
 Package bootstrap installs `claude-code@latest` and `codex` with Homebrew when `claude` or `codex` are missing, installs Node.js LTS through `fnm`, and enables `pnpm` and `pnpx` through Corepack. It does not install Cursor or GitHub Desktop. On macOS, dotfiles only links their CLI helpers into `~/.local/bin` when the matching app bundle already exists in `/Applications` or `~/Applications`. Visual Studio Code is not used at all: `~/.local/bin/code` is linked to Cursor's own `bin/code`, so `code` opens Cursor.
 On interactive Linux bootstraps, package bootstrap can also opt into a `desktop-vnc` bundle with `Xvfb`, `x11vnc`, Openbox, a systemd-managed always-on VNC display, and Google Chrome on `amd64`, or a `desktop-rdp` bundle with XFCE desktop packages, `xrdp`, and Google Chrome on `amd64`. Re-running `chezmoi init --apply` reconciles those services: selected ones are enabled and started, deselected ones are disabled and stopped. The VNC path tries to run `x11vnc -storepasswd` when an interactive TTY is available, exports `DISPLAY=:99` through the shared shell config, and defaults the virtual screen size to `1440x900x24`. The optional OpenClaw path installs `openclaw@2026.4.12` with `bun install --global`, runs `bun pm --global trust --all`, also creates `/var/tmp/openclaw-compile-cache` when possible, exports `NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache` plus `OPENCLAW_NO_RESPAWN=1`, and manages an OpenClaw gateway systemd user drop-in that adds those env vars and `DISPLAY=:99` when `desktop-vnc` is selected, including on reruns for existing installs.

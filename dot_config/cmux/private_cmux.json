@@ -1,0 +1,15 @@
+{
+  "$schema" : "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  "schemaVersion" : 1,
+  "shortcuts" : {
+    "bindings" : {
+      "newSurface" : "cmd+n",
+      "selectSurfaceByNumber" : "cmd+1",
+      "closeTab" : "cmd+w",
+      "newTab" : "cmd+shift+n",
+      "openBrowser" : "cmd+t",
+      "newWindow" : "unbound",
+      "selectWorkspaceByNumber" : "unbound"
+    }
+  }
+}

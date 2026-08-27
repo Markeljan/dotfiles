@@ -218,7 +218,7 @@ This repo stays intentionally small:
 - append-safe `authorized_keys` generation from the repo key and local file
 - minimal Neovim with a left file tree and editor pane
 - package bootstrap with APT and Homebrew formulae, Homebrew-managed Claude Code and Codex installs when missing, plus `fnm`, Node.js LTS, `uv`, and `bun`
-- minimal Ghostty config on macOS only
+- synced Ghostty and cmux terminal settings on macOS only
 - Cursor user settings and keybindings on macOS only
 - Kiro user settings on macOS only
 
@@ -234,9 +234,13 @@ This repo stays intentionally small:
 - `~/.config/fish/functions/rmrf.fish`
 - `~/.config/starship.toml`
 - `~/.config/nvim`
+- `~/.hushlogin` (empty; suppresses login banners in terminal sessions)
 - `~/.ssh/authorized_keys`
 - `~/.local/bin/fzf-preview`
-- `~/.config/ghostty/config`
+- `~/.config/ghostty/config` (macOS only)
+- `~/.config/ghostty/backgrounds/tahoe-day.jpg` (macOS only)
+- `~/.config/cmux/cmux.json` (macOS only; includes custom shortcuts)
+- `~/Library/Application Support/com.cmuxterm.app/config.ghostty` (macOS only; linked to the primary Ghostty config)
 - `~/Library/Application Support/Cursor/User/settings.json` (macOS only)
 - `~/Library/Application Support/Cursor/User/keybindings.json` (macOS only)
 - `~/Library/Application Support/Kiro/User/settings.json` (macOS only)
@@ -251,6 +255,7 @@ On macOS, dotfiles also manages app CLI helper symlinks in `~/.local/bin` when t
 On macOS, chezmoi also creates a symlink from:
 
 - `~/Library/Application Support/com.mitchellh.ghostty/config`
+- `~/Library/Application Support/com.cmuxterm.app/config.ghostty`
 
 to:
 
