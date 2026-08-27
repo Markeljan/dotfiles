@@ -277,12 +277,12 @@ v1 keeps the shell layer intentionally plain, with a few restored workflow helpe
 - optional `brew shellenv`
 - optional `fnm` initialization with Node.js LTS via `fnm`
 - optional completion bootstrap for bash, zsh, fish, Bun, pnpm, cargo, and `fzf`
-- optional `zoxide` and `starship` initialization
+- optional `zoxide` and `starship` initialization (`z` stays available without overriding `cd`)
 - shared functions: `mkcd`, `gc`, `rmrf`
 - bun shortcuts: `b`, `bi`, `bx`, `brd`, `brb`, `brs`, `brt`, `brl`, `brf`, `brc`
-- shell shortcuts: `cat`, `grep`, `mkdir`, `cd`, `rsy`
+- shell shortcuts: `cat`, `grep`, `mkdir`, `rsy`
 - `eza` shortcuts: `l`, `la`, `ll`, `lt`
-- git shortcuts: `ga`, `gd`, `gl`, `gp`, `gs`, `gfl`
+- git shortcuts: `ga`, `gd`, `gl`, `gp`, `gs`, `gst`, `gfl`
 - system shortcut: `sys`
 - `procs` default: `procs --pager disable --sorta mem`
 - pnpm shortcuts: `pi`, `px`, `prd`, `prb`, `prs`, `prt`, `prl`, `prf`, `prc`

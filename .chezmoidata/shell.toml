@@ -54,10 +54,6 @@ name = "cat"
 expansion = "bat --paging=never"
 
 [[shell.aliases]]
-name = "cd"
-expansion = "z"
-
-[[shell.aliases]]
 name = "ga"
 expansion = "git add"
 
@@ -83,6 +79,10 @@ expansion = "rg"
 
 [[shell.aliases]]
 name = "gs"
+expansion = "git status"
+
+[[shell.aliases]]
+name = "gst"
 expansion = "git status"
 
 [[shell.aliases]]
